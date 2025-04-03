@@ -6,6 +6,7 @@ import CacheableLookup from "cacheable-lookup";
 import http from "node:http";
 import https from "node:https";
 import os from "os";
+
 import { logger } from "./lib/logger";
 
 const numCPUs = process.env.NODE_ENV === "production" ? os.cpus().length : 2;

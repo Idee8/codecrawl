@@ -4,9 +4,9 @@
 *.csv
 dump.rdb
 
-/.next/
-
 .rdb
 .sentryclirc
 
-.env.*
+.env.local
+.env
+.env.production
