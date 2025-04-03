@@ -48,11 +48,7 @@ export const logger = winston.createLogger({
       ? [
           new winston.transports.File({
             filename:
-              "firecrawl-" +
-              (process.argv[1].includes("worker") ? "worker" : "app") +
-              "-" +
-              crypto.randomUUID() +
-              ".log",
+              `codecrawl-${process.argv[1].includes("worker") ? "worker" : "app"}-${crypto.randomUUID()}.log`,
           }),
         ]
       : []),
