@@ -1,7 +1,5 @@
 import { XMLBuilder } from 'fast-xml-parser';
 import Handlebars from 'handlebars';
-import path from 'node:path';
-import fs from 'node:fs/promises';
 
 import type { ProcessedFile } from '../file/fileTypes';
 import type {
@@ -36,7 +34,7 @@ const createRenderContext = (
   };
 };
 
-const generateParsableXMLOutput = async (
+const generateParsableXmlOutput = async (
   renderContext: RenderContext,
 ): Promise<string> => {
   const xmlBuilder = new XMLBuilder({ ignoreAttributes: false });
@@ -91,26 +89,43 @@ const generateHandlebarOutput = async (
   }
 };
 
+export const generateOutput = async (
+  rootDirs: string[],
+  config: ConfigMerged,
+  processedFiles: ProcessedFile[],
+  allFilePaths: string[],
+  deps = {
+    buildOutputGeneratorContext,
+    generateHandlebarOutput,
+    generateParsableXmlOutput,
+  },
+): Promise<string> => {
+  const outputGeneratorContext = await deps.buildOutputGeneratorContext(
+    rootDirs,
+    config,
+    allFilePaths,
+    processedFiles,
+  );
+  const renderContext = createRenderContext(outputGeneratorContext);
+
+  if (!config.output.parsableStyle)
+    return deps.generateHandlebarOutput(config, renderContext);
+  switch (config.output.style) {
+    case 'xml':
+      return deps.generateParsableXmlOutput(renderContext);
+    case 'markdown':
+      return deps.generateHandlebarOutput(config, renderContext);
+    default:
+      return deps.generateHandlebarOutput(config, renderContext);
+  }
+};
+
 export const buildOutputGeneratorContext = async (
   rootDirs: string[],
   config: ConfigMerged,
   allFilePaths: string[],
   processedFiles: ProcessedFile[],
 ): Promise<OutputGeneratorContext> => {
-  let repositoryInstruction = '';
-
-  if (config.output.instructionFilePath) {
-    const instructionPath = path.resolve(
-      config.cwd,
-      config.output.instructionFilePath,
-    );
-    try {
-      repositoryInstruction = await fs.readFile(instructionPath, 'utf-8');
-    } catch {
-      throw new Error(`Instruction file not found at ${instructionPath}`);
-    }
-  }
-
   let emptyDirPaths: string[] = [];
   if (config.output.includeEmptyDirectories) {
     try {
@@ -140,6 +155,5 @@ export const buildOutputGeneratorContext = async (
     treeString: generateTreeString(allFilePaths, emptyDirPaths),
     processedFiles,
     config,
-    instruction: repositoryInstruction,
   };
 };

@@ -6,7 +6,6 @@ export interface OutputGeneratorContext {
   treeString: string;
   processedFiles: ProcessedFile[];
   config: ConfigMerged;
-  instruction: string;
 }
 
 export interface RenderContext {

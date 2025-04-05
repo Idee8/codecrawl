@@ -8,6 +8,7 @@ import https from 'node:https';
 import os from 'node:os';
 
 import { logger } from './lib/logger';
+import { runRemoteAction } from './core/actions/remoteAction';
 
 const numCPUs = process.env.NODE_ENV === 'production' ? os.cpus().length : 2;
 
@@ -30,7 +31,11 @@ app.get('/', (_req, res) => {
 });
 
 app.get('/test', async (_req, res) => {
-  res.send('Hello, world!');
+  const { packResult } = await runRemoteAction(
+    'https://github.com/irere123/run-lang',
+    { compress: true, removeComments: true, removeEmptyLines: true },
+  );
+  res.send(packResult);
 });
 
 const DEFAULT_PORT = process.env.PORT ?? 4000;

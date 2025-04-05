@@ -1,4 +1,3 @@
-import path from 'node:path';
 import { logger } from '../../lib/logger';
 import { initPiscina } from '../../lib/processConcurrency';
 import type { RawFile } from './fileTypes';
@@ -6,8 +5,10 @@ import type { FileCollectTask } from './workers/fileCollectWorker';
 import type { CrawlProgressCallback } from '../../types';
 
 const initTaskRunner = (numOfTasks: number) => {
-  const workerPath = path.join(__dirname, './workers/fileCollectWorker');
-  const pool = initPiscina(numOfTasks, workerPath);
+  const pool = initPiscina(
+    numOfTasks,
+    require.resolve('./workers/fileCollectWorker'),
+  );
   return (task: FileCollectTask) => pool.run(task);
 };
 

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "concurrently \"nodemon --exec node dist/src/index.js\" \"tsc --watch\"",
     "start": "tsc && node dist/src/index.js",
     "build": "tsc"
   },
@@ -53,6 +53,7 @@
     "@types/node": "^22.14.0",
     "@types/strip-comments": "^2.0.4",
     "@types/supertest": "^6.0.3",
+    "concurrently": "^9.1.2",
     "nodemon": "^3.1.9",
     "supertest": "^7.1.0",
     "ts-jest": "^29.3.1",

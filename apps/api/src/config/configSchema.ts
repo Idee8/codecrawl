@@ -99,16 +99,14 @@ export const configDefaultSchema = z.object({
     .default({}),
 });
 
-export const configFileSchema = configBaseSchema;
-
-export const configMergedSchema = configDefaultSchema.and(configFileSchema).and(
+export const configMergedSchema = configDefaultSchema.and(configBaseSchema).and(
   z.object({
-    cwd: z.string(),
+    cwd: z.string().optional(),
   }),
 );
 
 export type ConfigDefault = z.infer<typeof configDefaultSchema>;
-export type ConfigDefaultonfigFile = z.infer<typeof configFileSchema>;
 export type ConfigMerged = z.infer<typeof configMergedSchema>;
+export type ConfigBase = z.infer<typeof configBaseSchema>;
 
 export const defaultConfig = configDefaultSchema.parse({});

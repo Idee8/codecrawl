@@ -1,8 +1,8 @@
-import type { ConfigMerged } from '../../config/configSchema.js';
-import type { CrawlProgressCallback } from '../../types.js';
-import type { ProcessedFile } from '../file/fileTypes.js';
-import { calculateAllFileMetrics } from './calculateAllFileMetrics.js';
-import { calculateOutputMetrics } from './calculateOutputMetrics.js';
+import type { ConfigMerged } from '../../config/configSchema';
+import type { CrawlProgressCallback } from '../../types';
+import type { ProcessedFile } from '../file/fileTypes';
+import { calculateAllFileMetrics } from './calculateAllFileMetrics';
+import { calculateOutputMetrics } from './calculateOutputMetrics';
 
 export interface CalculateMetricsResult {
   totalFiles: number;
