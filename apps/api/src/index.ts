@@ -30,11 +30,14 @@ app.get('/', (_req, res) => {
   res.send('CRAWLERS: Hello World');
 });
 
-app.get('/test', async (_req, res) => {
-  const { packResult } = await runRemoteAction(
-    'https://github.com/irere123/run-lang',
-    { compress: true, removeComments: true, removeEmptyLines: true },
-  );
+app.get('/test', async (req, res) => {
+  const repoUrl =
+    (req.query.repoUrl as string) ?? 'https://github.com/irere123/run-lang';
+  const { packResult } = await runRemoteAction(repoUrl, {
+    compress: true,
+    removeComments: true,
+    removeEmptyLines: true,
+  });
   res.send(packResult);
 });
 
