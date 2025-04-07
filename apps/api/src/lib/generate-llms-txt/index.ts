@@ -159,8 +159,12 @@ export async function performGenerateLlmsTxt(
     }
 
     return {
-      url: url,
-      markdown: results.packResult.output,
+      success: true,
+      data: {
+        generatedText: results.packResult.output,
+        fullText: results.packResult.output,
+        showFullText: showFullText,
+      },
     };
   } catch (error) {
     logger.error('Generate LLMs text error', { error });

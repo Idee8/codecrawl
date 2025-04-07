@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"nodemon --exec node dist/src/index.js\" \"tsc --watch\"",
     "start": "drizzle-kit migrate && node dist/src/index.js",
-    "workers": "nodemon --exec ts-node src/services/queue-worker.ts",
+    "workers": "nodemon --exec node dist/src/services/queue-worker.js",
     "worker:prod": "node dist/src/services/queue-worker.js",
     "db:gen": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
