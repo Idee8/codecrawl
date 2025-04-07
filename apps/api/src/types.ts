@@ -2,9 +2,12 @@ import type { OutputStyle } from './config/configSchema';
 
 export type CrawlProgressCallback = (message: string) => void;
 
+export type PlanType = 'standard' | 'scale' | 'hobby' | 'growth' | 'free';
+
 export interface CrawlOptions {
-  // Basic Options
-  version?: boolean;
+  // Codecrawl Cloud Options
+  teamId?: string;
+  plan?: string;
 
   // Output Options
   output?: string;
@@ -47,4 +50,10 @@ export interface CrawlOptions {
   topFilesLen?: number;
   verbose?: boolean;
   quiet?: boolean;
+}
+
+export enum RateLimiterMode {
+  Crawl = 'crawl',
+  CrawlStatus = 'crawlStatus',
+  Search = 'search',
 }
