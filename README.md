@@ -13,16 +13,6 @@ _Pst. hey, you, join our stargazers :)_
   <img src="https://img.shields.io/github/stars/Idee8/codecrawl.svg?style=social&label=Star&maxAge=2592000" alt="GitHub stars">
 </a>
 
-## How to use it?
-
-We provide an easy to use API with our hosted version. You can find the playground and documentation [here](https://crawl.irere.dev/playground). You can also self host the backend if you'd like.
-
-Check out the following resources to get started:
-- [x] **API**: [Documentation](https://crawl-docs.irere.dev/api-reference/introduction)
-- [x] **SDKs**: [Python](https://crawl-docs.irere.dev/sdks/python), [Node](https://crawl-docs.irere.dev/sdks/node), [Go](https://crawl-docs.irere.dev/sdks/go), [Rust](https://crawl-docs.irere.dev/sdks/rust)
-
-To run locally, refer to guide [here](https://github.com/Idee8/codecrawl/blob/main/CONTRIBUTING.md).
-
 ### API Key
 
 To use the API, you need to sign up on [CodeCrawl](https://crawl.irere.dev) and get an API key.
@@ -30,8 +20,7 @@ To use the API, you need to sign up on [CodeCrawl](https://crawl.irere.dev) and 
 ### Features
 
 - [**Index**](#indexing): Index repository content and get clean data in multiple formats (markdown, XML, plain text)
-- [**Scrape**](#scraping-readmes): Extract README content and metadata from repository URLs
-- [**Map**](#filetree): Get repository file structure with search capabilities
+- [**Tree**](#filetree): Get repository file structure with search capabilities
 - [**Search**](#search): Search repository content with semantic understanding
 - [**Batch**](#batch-indexing-multiple-urls): Process multiple repositories simultaneously
 
@@ -116,20 +105,6 @@ curl -X GET https://api.irere.dev/v1/index/123-456-789 \
 }
 ```
 
-### Scraping READMEs
-
-Used to scrape information from README.md URL and get its content in the specified formats.
-
-```bash
-curl -X POST https://api.irere.dev/v1/scrape \
-    -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer YOUR_API_KEY' \
-    -d '{
-      "url": "https://github.com/Irere123/run-lang/blob/master/README.md",
-      "formats" : ["markdown", "xml"]
-    }'
-```
-
 Response:
 
 ```json
@@ -152,7 +127,7 @@ Response:
 Used to get the file tree of the whole repository using its URL. This returns markdown, plain, or html for the file tree of the repo
 
 ```bash cURL
-curl -X POST https://api.irere.dev/v1/map \
+curl -X POST https://api.irere.dev/v1/tree \
     -H 'Content-Type: application/json' \
     -H 'Authorization: Bearer YOUR_API_KEY' \
     -d '{
@@ -251,12 +226,6 @@ curl -X POST https://api.irere.dev/v1/search \
 }
 ```
 
-## Open Source vs Cloud Offering
-
-Codecrawl is open source available under the AGPL-3.0 license. 
-
-To deliver the best possible product, we will offer a hosted version of Codecrawl alongside our open-source offering. The cloud solution will allow us to continuously innovate and maintain a high-quality, sustainable service for all users.
-
 
 ## Contributing
 
@@ -270,26 +239,7 @@ _It is the sole responsibility of the end users to respect repositories' policie
   <img alt="contributors" src="https://contrib.rocks/image?repo=Idee8/codecrawl"/>
 </a>
 
-## License Disclaimer
-
-This project is primarily licensed under the GNU Affero General Public License v3.0 (AGPL-3.0), as specified in the LICENSE file in the root directory of this repository. However, certain components of this project are licensed under the MIT License. Refer to the LICENSE files in these specific directories for details.
-
-Please note:
-
-- The AGPL-3.0 license applies to all parts of the project unless otherwise specified.
-- The SDKs and some UI components are licensed under the MIT License. Refer to the LICENSE files in these specific directories for details.
-- When using or contributing to this project, ensure you comply with the appropriate license terms for the specific component you are working with.
-
-For more details on the licensing of specific components, please refer to the LICENSE files in the respective directories or contact the project maintainers.
-
-
 
 ## Credits 
 
 Built with inspiration and techniques from [Firecrawl](https://github.com/mendableai/firecrawl) and [Repomix](https://github.com/yamadashy/repomix). Special thanks to their contributors for pioneering web crawling and repository processing approaches.
-
-<p align="right" style="font-size: 14px; color: #555; margin-top: 20px;">
-    <a href="#readme-top" style="text-decoration: none; color: #007bff; font-weight: bold;">
-        ↑ Back to Top ↑
-    </a>
-</p>
