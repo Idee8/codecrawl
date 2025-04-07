@@ -39,7 +39,7 @@ export async function getLlmsTextFromCache(
   }
 }
 
-export async function saveLlmsTextCache(
+export async function saveLlmsTxtToCache(
   url: string,
   llmstxt: string,
   llmstxtFull: string,
@@ -153,10 +153,26 @@ export async function performGenerateLlmsTxt(
 
     const results = await runRemoteAction(url, { remote: url });
 
+    // Limit pages and remove separators before final update
+    const llmstxt = results.packResult.output;
+    const llmsFulltxt = results.packResult.output;
+    const cleanFullText = results.packResult.output;
+
     if (!results || !results.packResult) {
       logger.error(`Failed to scrape URL ${url}`);
       return null;
     }
+
+    // After successful generation, save to cache
+    await saveLlmsTxtToCache(url, llmstxt, llmsFulltxt, effectiveMaxUrls);
+
+    // Update final result with both generated text and full text
+    await updateGeneratedLlmsTxt(generationId, {
+      status: 'completed',
+      generatedText: llmstxt,
+      fullText: cleanFullText,
+      showFullText: showFullText,
+    });
 
     return {
       success: true,
