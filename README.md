@@ -22,6 +22,7 @@ To use the API, you need to sign up on [CodeCrawl](https://crawl.irere.dev) and 
 - [**Index**](#indexing): Index repository content and get clean data in multiple formats (markdown, XML, plain text)
 - [**Tree**](#filetree): Get repository file structure with search capabilities
 - [**Search**](#search): Search repository content with semantic understanding
+- [**LLMs.txt**](#llms.txt): Generate a Llms.txt to feed directly to any model
 - [**Batch**](#batch-indexing-multiple-urls): Process multiple repositories simultaneously
 
 ### Powerful Capabilities
@@ -63,6 +64,52 @@ Returns a indexing job id and the url to check the status of the index.
   "url": "https://api.irere.dev/v1/index/123-456-789"
 }
 ```
+
+
+### LLMs.txt
+
+Generate a `llms.txt` file for a repository, optimized for feeding Language Model training. This endpoint initiates a job to create the `llms.txt` file and returns a job ID to track its progress.
+
+```bash
+curl -X POST https://api.irere.dev/v1/llmstxt \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer YOUR_API_KEY' \
+  -d '{
+    "url": "https://github.com/irere123/run-lang"
+  }'
+```
+
+Returns a job ID to check the status of the `llms.txt` generation.
+
+```json
+{
+  "success": true,
+  "id": "123-456-789"
+}
+```
+
+### Check LLMs.txt Job
+
+Check the status and retrieve the content of a `llms.txt` generation job using the job ID.
+
+```bash
+curl -X GET https://api.irere.dev/v1/llmstxt/123-456-789 \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer YOUR_API_KEY'
+```
+
+Returns the status and data of the `llms.txt` generation job.
+
+```json
+{
+  "success": true,
+  "status": "completed",
+  "data": {
+    "llmstxt": "Content of the llms.txt file..."
+  }
+}
+```
+
 
 ### Check Index Job
 
