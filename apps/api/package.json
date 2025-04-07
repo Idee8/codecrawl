@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"nodemon --exec node dist/src/index.js\" \"tsc --watch\"",
-    "start": "tsc && node dist/src/index.js",
+    "start": "drizzle-kit migrate && node dist/src/index.js",
     "workers": "nodemon --exec ts-node src/services/queue-worker.ts",
     "worker:prod": "node dist/src/services/queue-worker.js",
+    "db:gen": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "build": "tsc"
   },
   "keywords": [],
@@ -65,6 +67,7 @@
     "@types/strip-comments": "^2.0.4",
     "@types/supertest": "^6.0.3",
     "concurrently": "^9.1.2",
+    "drizzle-kit": "^0.30.6",
     "nodemon": "^3.1.9",
     "supertest": "^7.1.0",
     "ts-jest": "^29.3.1",
