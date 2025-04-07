@@ -11,7 +11,8 @@ import {
   removeConcurrencyLimitActiveJob,
   takeConcurrencyLimitedJob,
 } from '../lib/concurrency-limit';
-import { runRemoteAction } from '../core/actions/remoteAction';
+import { updateGeneratedLlmsTxt } from '../lib/generate-llms-txt/redis';
+import { performGenerateLlmsTxt } from '../lib/generate-llms-txt';
 
 class RacedRedirectError extends Error {
   constructor() {
@@ -184,20 +185,33 @@ const processGenerateLlmsTxtJobInternal = async (
   }, jobLockExtendInterval);
 
   try {
-    const result = await runRemoteAction(job.data.repoUrl, {
-      remote: job.data.repoUrl,
+    const result = await performGenerateLlmsTxt({
+      generationId: job.data.generationId,
       teamId: job.data.teamId,
       plan: job.data.plan,
+      url: job.data.request.url,
+      maxUrls: job.data.request.maxUrls,
+      showFullText: job.data.request.showFullText,
+      subId: job.data.subId,
     });
 
-    if (result.packResult) {
-      await job.moveToCompleted(result.packResult, token, false);
+    if (result?.success) {
+      await job.moveToCompleted(result, token, false);
+      await updateGeneratedLlmsTxt(job.data.generateId, {
+        status: 'completed',
+        generatedText: result.data.generatedText,
+        fullText: result.data.fullText,
+      });
       return result;
     } else {
       const error = new Error(
         'LLMs text generation failed without specific error',
       );
       await job.moveToFailed(error, token, false);
+      await updateGeneratedLlmsTxt(job.data.generateId, {
+        status: 'failed',
+        error: error.message,
+      });
       return { success: false, error: error.message };
     }
   } catch (error) {
@@ -208,6 +222,11 @@ const processGenerateLlmsTxtJobInternal = async (
     } catch (e) {
       logger.error('Failed to move job to failed state in Redis', { error });
     }
+
+    await updateGeneratedLlmsTxt(job.data.generateId, {
+      status: 'failed',
+      error: error.message || 'Unknown error occurred',
+    });
 
     return { success: false, error: error.message || 'Unknown error occurred' };
   } finally {
