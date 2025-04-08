@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1744028948869,
-      "tag": "0000_broad_maestro",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1744108007561,
-      "tag": "0001_rainy_doomsday",
+      "when": 1744115895233,
+      "tag": "0000_fearless_loners",
       "breakpoints": true
     }
   ]
