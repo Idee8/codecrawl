@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { Request, Response } from 'express';
 import { saveGeneratedLlmsTxt } from '../../lib/generate-llms-txt/redis';
 import { getGenerateLlmsTxtQueue } from '../../services/queue-service';
@@ -14,7 +15,7 @@ export type GenerateLLMsTextResponse = {
  * @returns A promise that resolves when the generation job is queued.
  */
 export async function generateLLMsTextController(req: Request, res: Response) {
-  const generationId = crypto.randomUUID();
+  const generationId = randomUUID();
   const jobData = {
     request: req.body,
     teamId: '84594',
