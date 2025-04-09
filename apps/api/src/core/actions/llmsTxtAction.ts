@@ -1,14 +1,18 @@
 import { isGitInstalled } from '../file/gitCommand';
 import {
   configMergedSchema,
-  type OutputStyle,
   type ConfigBase,
   type ConfigMerged,
+  type OutputStyle,
 } from '../../config/configSchema';
 import { logger } from '../../lib/logger';
 import type { CrawlOptions } from '../../types';
-import { pack, type PackResult } from '../packager';
 import { rethrowValidationErrorIfZodError } from '../../utils/errorHandle';
+import { generateOutput } from '../output/outputGenerate';
+import { collectFiles } from '../file/fileCollect';
+import { processFiles } from '../file/fileProcess';
+import { searchFiles } from '../file/fileSearch';
+import { sortPaths } from '../file/filePathSort';
 import {
   parseRemoteValue,
   createTempDirectory,
@@ -16,18 +20,18 @@ import {
   cleanupTempDirectory,
 } from '../utils/remoteUtils';
 
-export interface DefaultActionRunnerResult {
-  packResult: PackResult;
+export interface LlmsTxtActionRunnerResult {
+  llmsTxt: string;
   config: ConfigMerged;
 }
 
 /**
- * Clones a remote repository and runs the default packing process.
+ * Clones a remote repository and generates the LLMSTxt output string.
  * @param remoteUrl The remote repository URL or shorthand.
- * @param options Crawl options influencing the packing process.
- * @returns The packing result and the merged configuration.
+ * @param options Crawl options influencing the output generation.
+ * @returns The generated LLMSTxt string and the merged configuration.
  */
-export const runDefaultAction = async (
+export const runLlmsTxtAction = async (
   remoteUrl: string,
   options: CrawlOptions,
   deps = {
@@ -36,11 +40,15 @@ export const runDefaultAction = async (
     createTempDirectory,
     cloneRepository,
     cleanupTempDirectory,
-    pack,
+    searchFiles,
+    sortPaths,
+    collectFiles,
+    processFiles,
+    generateOutput,
     buildConfig,
   },
-): Promise<DefaultActionRunnerResult> => {
-  logger.info('Running default action for remote URL:', remoteUrl);
+): Promise<LlmsTxtActionRunnerResult> => {
+  logger.info('Running llmstxt action for remote URL:', remoteUrl);
 
   if (!(await deps.isGitInstalled())) {
     throw new Error('Git is not installed or not in the system PATH.');
@@ -48,7 +56,7 @@ export const runDefaultAction = async (
 
   const parsedFields = deps.parseRemoteValue(remoteUrl);
   const tempDirPath = await deps.createTempDirectory();
-  let packResult: PackResult;
+  let llmsTxt: string;
 
   try {
     await deps.cloneRepository(
@@ -59,9 +67,32 @@ export const runDefaultAction = async (
 
     const config = deps.buildConfig(options);
 
-    packResult = await deps.pack([tempDirPath], config, (message) => {
-      logger.info(message);
-    });
+    // --- Full pipeline: Search -> Sort -> Collect -> Process -> Generate ---
+    logger.info('Searching files in cloned repo...');
+    const searchResult = await deps.searchFiles(tempDirPath, config);
+    const allFilePaths = searchResult.filePaths;
+
+    logger.info('Sorting files...');
+    const sortedFilePaths = await deps.sortPaths(allFilePaths);
+
+    logger.info('Collecting files...');
+    const rawFiles = await deps.collectFiles(
+      sortedFilePaths,
+      tempDirPath,
+      () => {},
+    );
+
+    logger.info('Processing files...');
+    const processedFiles = await deps.processFiles(rawFiles, config, () => {});
+
+    logger.info('Generating output...');
+    llmsTxt = await deps.generateOutput(
+      [tempDirPath],
+      config,
+      processedFiles,
+      allFilePaths,
+    );
+    // --- End of pipeline ---
   } finally {
     await deps.cleanupTempDirectory(tempDirPath);
   }
@@ -69,14 +100,13 @@ export const runDefaultAction = async (
   const finalConfig = buildConfig(options);
 
   return {
-    packResult,
+    llmsTxt,
     config: finalConfig,
   };
 };
 
 /**
- * Builds Crawl configuration from options. Simplified as CWD is no longer relevant.
- *
+ * Builds configuration relevant to LLMSTxt generation.
  */
 const buildConfig = (options: CrawlOptions): ConfigMerged => {
   const config: ConfigBase = {};
@@ -111,9 +141,6 @@ const buildConfig = (options: CrawlOptions): ConfigMerged => {
       showLineNumbers: options.outputShowLineNumbers,
     };
   }
-  if (options.copy) {
-    config.output = { ...config.output, copyToClipboard: options.copy };
-  }
   if (options.style) {
     config.output = {
       ...config.output,
@@ -124,21 +151,6 @@ const buildConfig = (options: CrawlOptions): ConfigMerged => {
     config.output = {
       ...config.output,
       parsableStyle: options.parsableStyle,
-    };
-  }
-  if (options.securityCheck === false) {
-    config.security = { enableSecurityCheck: options.securityCheck };
-  }
-  if (options.fileSummary === false) {
-    config.output = {
-      ...config.output,
-      fileSummary: false,
-    };
-  }
-  if (options.directoryStructure === false) {
-    config.output = {
-      ...config.output,
-      directoryStructure: false,
     };
   }
   if (options.removeComments !== undefined) {
@@ -153,44 +165,29 @@ const buildConfig = (options: CrawlOptions): ConfigMerged => {
       removeEmptyLines: options.removeEmptyLines,
     };
   }
-  if (options.headerText !== undefined) {
-    config.output = { ...config.output, headerText: options.headerText };
-  }
-
-  if (options.compress !== undefined) {
-    config.output = { ...config.output, compress: options.compress };
-  }
-
-  if (options.tokenCountEncoding) {
-    config.tokenCount = { encoding: options.tokenCountEncoding };
-  }
-  if (options.instructionFilePath) {
-    config.output = {
-      ...config.output,
-      instructionFilePath: options.instructionFilePath,
-    };
-  }
   if (options.includeEmptyDirectories) {
     config.output = {
       ...config.output,
       includeEmptyDirectories: options.includeEmptyDirectories,
     };
   }
-
+  if (options.headerText !== undefined) {
+    config.output = { ...config.output, headerText: options.headerText };
+  }
   if (options.gitSortByChanges === false) {
     config.output = {
       ...config.output,
-      git: {
-        ...config.output?.git,
-        sortByChanges: false,
-      },
+      git: { ...config.output?.git, sortByChanges: false },
     };
   }
 
   try {
     return configMergedSchema.parse(config);
   } catch (error) {
-    rethrowValidationErrorIfZodError(error, 'Invalid configuration options');
+    rethrowValidationErrorIfZodError(
+      error,
+      'Invalid configuration options for llmstxt',
+    );
     throw error;
   }
 };

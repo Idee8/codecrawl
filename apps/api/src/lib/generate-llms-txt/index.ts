@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import type { PlanType } from '../../types';
 import { createLlmsTxt, updateLlmsTxtByRepoUrl } from '../../db/mutations';
 import {
@@ -100,16 +98,10 @@ interface GenerateLLMsTextServiceOptions {
   subId?: string;
 }
 
-const descriptionSchema = z.object({
-  description: z.string(),
-  title: z.string(),
-});
-
 export async function performGenerateLlmsTxt(
   options: GenerateLLMsTextServiceOptions,
 ) {
-  const { generationId, maxUrls, plan, showFullText, teamId, url, subId } =
-    options;
+  const { generationId, maxUrls, showFullText, teamId, url } = options;
 
   const startTime = Date.now();
   const logger = _logger.child({
@@ -120,76 +112,107 @@ export async function performGenerateLlmsTxt(
   });
 
   try {
-    // Enforce max URL limit
-    const effectiveMaxUrls = Math.min(maxUrls, 5000);
+    // Enforce max URL limit (assuming this applies to files/pages within the repo)
+    // The actual enforcement might happen within runRemoteAction based on config
+    const effectiveMaxUrls = Math.min(maxUrls ?? 5000, 5000); // Use default 5000 if maxUrls is undefined
 
     // Check cache first
+    logger.info('Checking cache for LLMs text', { url, effectiveMaxUrls });
     const cachedResult = await getLlmsTextFromCache(url, effectiveMaxUrls);
 
     if (cachedResult) {
       logger.info('Found cached LLMs text', { url });
 
-      // TODO: Limit content and remove separators before returning
-
-      // TODO: Limit llmstxt entries to match maxUrls
+      // Use cached data
+      const generatedText = cachedResult.llmstxt;
+      const fullText = cachedResult.llmstxt_full;
 
       // Update final result with cached text
       await updateGeneratedLlmsTxt(generationId, {
         status: 'completed',
-        generatedText: cachedResult.llmstxt,
-        fullText: cachedResult.llmstxt_full,
-        showFullText: showFullText,
+        generatedText: generatedText,
+        fullText: fullText,
+        showFullText: showFullText, // Store the requested showFullText flag
       });
 
+      logger.info('Successfully updated job with cached data', {
+        generationId,
+        duration: Date.now() - startTime,
+      });
       return {
         success: true,
         data: {
-          generatedText: cachedResult.llmstxt,
-          fullText: cachedResult.llmstxt_full,
-          showFullText: showFullText,
+          generatedText: generatedText,
+          fullText: fullText,
+          showFullText: showFullText, // Return based on the request
         },
       };
     }
 
-    const results = await runRemoteAction(url, { remote: url });
+    logger.info('No cache hit, proceeding with remote action', { url });
+    // Assuming runRemoteAction takes options that might include limits derived from effectiveMaxUrls
+    // Pass effectiveMaxUrls as topFilesLen to potentially limit the number of files in the output,
+    // ensuring comprehensiveness up to the specified limit.
+    const results = await runRemoteAction(url, {
+      remote: url,
+      topFilesLen: effectiveMaxUrls, // Map maxUrls to topFilesLen
+      // Add other relevant options if needed based on CrawlOptions
+      // For max comprehensiveness, ensure things like removeComments are not true by default
+    });
 
-    // Limit pages and remove separators before final update
-    const llmstxt = results.packResult.output;
-    const llmsFulltxt = results.packResult.output;
-    const cleanFullText = results.packResult.output;
-
-    if (!results || !results.packResult) {
-      logger.error(`Failed to scrape URL ${url}`);
-      return null;
+    // Check for valid results
+    if (!results?.packResult?.output) {
+      logger.error('Remote action failed to return valid packResult.output', {
+        url,
+        results,
+      });
+      // Throw an error to be caught by the main catch block
+      throw new Error(
+        `Failed to generate content: Remote action did not return expected output for URL: ${url}`,
+      );
     }
 
+    // Assuming packResult.output is the complete, intended text.
+    // If limiting/separating logic is needed, it should ideally be in the pack/output generation.
+    const generatedOutput = results.packResult.output;
+    const llmstxt = generatedOutput; // Assign the full output as the primary text
+    const llmsFulltxt = generatedOutput; // Assign the full output as the 'full' text
+
+    logger.info('Remote action successful, saving to cache', { url });
     // After successful generation, save to cache
     await saveLlmsTxtToCache(url, llmstxt, llmsFulltxt, effectiveMaxUrls);
 
-    // Update final result with both generated text and full text
+    logger.info('Updating final job status', { generationId });
+    // Update final result with generated text
     await updateGeneratedLlmsTxt(generationId, {
       status: 'completed',
       generatedText: llmstxt,
-      fullText: cleanFullText,
-      showFullText: showFullText,
+      fullText: llmsFulltxt, // Save the full text
+      showFullText: showFullText, // Store the requested flag
     });
 
+    logger.info('Successfully completed LLMs text generation', {
+      generationId,
+      duration: Date.now() - startTime,
+    });
     return {
       success: true,
       data: {
-        generatedText: results.packResult.output,
-        fullText: results.packResult.output,
-        showFullText: showFullText,
+        generatedText: llmstxt,
+        fullText: llmsFulltxt,
+        showFullText: showFullText, // Return based on the request
       },
     };
   } catch (error) {
-    logger.error('Generate LLMs text error', { error });
+    logger.error('Generate LLMs text error', { error, generationId });
 
+    // Update status to failed
     await updateGeneratedLlmsTxt(generationId, {
       status: 'failed',
-      error: error.message || 'Unknown error occurred',
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
 
+    // Rethrow the error to be handled by the caller or job runner
     throw error;
   }
 }

@@ -12,22 +12,19 @@ import {
   takeConcurrencyLimitedJob,
 } from '../lib/concurrency-limit';
 import { updateGeneratedLlmsTxt } from '../lib/generate-llms-txt/redis';
-import { performGenerateLlmsTxt } from '../lib/generate-llms-txt';
-
-class RacedRedirectError extends Error {
-  constructor() {
-    super('Raced redirect error');
-  }
-}
+import {
+  getLlmsTextFromCache,
+  saveLlmsTxtToCache,
+} from '../lib/generate-llms-txt/index';
+import { runLlmsTxtAction } from '../core/actions/llmsTxtAction';
+import { runComprehensiveLlmsTxtAction } from '../core/actions/runComprehensiveLlmsTxtAction';
+import type { CrawlOptions } from '../types';
 
 /**
  * Globals
  */
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const runningJobs: Set<string> = new Set();
-const workerLockDuration = Number(process.env.WORKER_LOCK_DURATION) || 6000;
-const workerStalledCheckInterval =
-  Number(process.env.WORKER_STALLED_CHECK_INTERVAL) || 30000;
 const jobLockExtendInterval =
   Number(process.env.JOB_LOCK_EXTEND_INTERVAL) || 15000;
 const jobLockExtensionTime =
@@ -123,16 +120,13 @@ const workerFun = async (
           await removeConcurrencyLimitActiveJob(job.data.teamId, job.id);
           cleanOldConcurrencyLimitEntries(job.data.teamId);
 
-          // Queue up next job, if it exists
-          // No need to check if we're under the limit here -- if the current job is finished
-          // we are 1 under the limit, assuming the job insertion logic never over-inserts.
           const nextJob = await takeConcurrencyLimitedJob(job.data.teamId);
           if (nextJob !== null) {
             await pushConcurrencyLimitActiveJob(
               job.data.teamId,
               nextJob.id,
               60 * 1000,
-            ); // 60s initial timeout
+            );
 
             await queue.add(
               nextJob.id,
@@ -151,9 +145,18 @@ const workerFun = async (
       }
 
       if (job.data) {
-        processJobInternal(token, job).finally(() => afterJobDone(job));
+        try {
+          processJobInternal(token, job).finally(() => afterJobDone(job));
+        } catch (processError) {
+          loggger.error('Error during processJobInternal invocation', {
+            jobId: job.id,
+            processError,
+          });
+          afterJobDone(job);
+        }
       } else {
-        processJobInternal(token, job).finally(() => afterJobDone(job));
+        loggger.warn('Job received without data', { jobId: job.id });
+        afterJobDone(job);
       }
 
       await sleep(gotJobInterval);
@@ -164,80 +167,143 @@ const workerFun = async (
 };
 
 /**
- * Job Processors
+ * Job Processor for LLMs Text Generation
  */
-
 const processGenerateLlmsTxtJobInternal = async (
   token: string,
   job: Job & { id: string },
-) => {
+): Promise<{ success: boolean; data?: any; error?: string }> => {
+  const { generationId, request, teamId } = job.data;
+  const { url, maxUrls, showFullText } = request;
+
   const logger = _logger.child({
     module: 'generate-llmstxt-worker',
     method: 'processJobInternal',
     jobId: job.id,
-    generateId: job.data.generateId,
-    teamId: job.data?.teamId ?? undefined,
+    generationId,
+    teamId: teamId ?? undefined,
+    url: url,
   });
 
   const extendLockInterval = setInterval(async () => {
-    logger.info(`🔄 Worker extending lock on job ${job.id}`);
-    await job.extendLock(token, jobLockExtensionTime);
+    try {
+      logger.info(`🔄 Worker extending lock on job ${job.id}`);
+      await job.extendLock(token, jobLockExtensionTime);
+    } catch (lockError) {
+      logger.error(`Failed to extend lock for job ${job.id}`, { lockError });
+    }
   }, jobLockExtendInterval);
 
+  let jobResult: { success: boolean; data?: any; error?: string } = {
+    success: false,
+    error: 'Processing did not complete',
+  };
+
   try {
-    const result = await performGenerateLlmsTxt({
-      generationId: job.data.generationId,
-      teamId: job.data.teamId,
-      plan: job.data.plan,
-      url: job.data.request.url,
-      maxUrls: job.data.request.maxUrls,
-      showFullText: job.data.request.showFullText,
-      subId: job.data.subId,
+    logger.info(`🚀 Starting LLMs text generation job`, { showFullText });
+
+    const crawlOptions: Partial<CrawlOptions> = {
+      topFilesLen: maxUrls,
+    };
+
+    const effectiveMaxUrls = Math.min(maxUrls ?? 5000, 5000);
+    logger.info('Checking cache...');
+    const cachedResult = await getLlmsTextFromCache(url, effectiveMaxUrls);
+
+    if (cachedResult) {
+      logger.info('Cache hit!', { url });
+      await updateGeneratedLlmsTxt(generationId, {
+        status: 'completed',
+        generatedText: cachedResult.llmstxt,
+        fullText: cachedResult.llmstxt_full,
+        showFullText: showFullText,
+      });
+      jobResult = {
+        success: true,
+        data: {
+          generatedText: cachedResult.llmstxt,
+          fullText: cachedResult.llmstxt_full,
+          showFullText: showFullText,
+        },
+      };
+      await job.moveToCompleted(jobResult, token, false);
+      logger.info(`✅ Job completed from cache`);
+      return jobResult;
+    }
+
+    logger.info('Cache miss. Running appropriate action...');
+    let actionResult: any;
+    let generatedText: string;
+    let fullText: string;
+
+    if (showFullText) {
+      logger.info('Running Comprehensive Action...');
+      actionResult = await runComprehensiveLlmsTxtAction(
+        url,
+        crawlOptions as CrawlOptions,
+      );
+      generatedText = actionResult.comprehensiveText;
+      fullText = actionResult.comprehensiveText;
+    } else {
+      logger.info('Running Standard Action...');
+      actionResult = await runLlmsTxtAction(url, crawlOptions as CrawlOptions);
+      generatedText = actionResult.llmsTxt;
+      fullText = actionResult.llmsTxt;
+    }
+
+    logger.info('Action completed. Saving to cache...');
+    await saveLlmsTxtToCache(url, generatedText, fullText, effectiveMaxUrls);
+
+    logger.info('Updating job status in Redis...');
+    await updateGeneratedLlmsTxt(generationId, {
+      status: 'completed',
+      generatedText: generatedText,
+      fullText: fullText,
+      showFullText: showFullText,
     });
 
-    if (result?.success) {
-      await job.moveToCompleted(result, token, false);
-      await updateGeneratedLlmsTxt(job.data.generateId, {
-        status: 'completed',
-        generatedText: result.data.generatedText,
-        fullText: result.data.fullText,
-      });
-      return result;
-    } else {
-      const error = new Error(
-        'LLMs text generation failed without specific error',
-      );
-      await job.moveToFailed(error, token, false);
-      await updateGeneratedLlmsTxt(job.data.generateId, {
-        status: 'failed',
-        error: error.message,
-      });
-      return { success: false, error: error.message };
-    }
+    jobResult = {
+      success: true,
+      data: { generatedText, fullText, showFullText },
+    };
+    await job.moveToCompleted(jobResult, token, false);
+    logger.info(`✅ Job completed successfully after running action`);
   } catch (error) {
-    logger.error(`🚫 Job errored ${job.id} - ${error}`, { error });
+    logger.error(`🚫 Job errored`, { error });
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'Unknown error during processing';
+    jobResult = { success: false, error: errorMessage };
 
     try {
-      await job.moveToFailed(error, token, false);
-    } catch (e) {
-      logger.error('Failed to move job to failed state in Redis', { error });
+      await job.moveToFailed(
+        error instanceof Error ? error : new Error(errorMessage),
+        token,
+        false,
+      );
+    } catch (moveError) {
+      logger.error('Failed to move job to failed state', { moveError });
     }
 
-    await updateGeneratedLlmsTxt(job.data.generateId, {
+    await updateGeneratedLlmsTxt(generationId, {
       status: 'failed',
-      error: error.message || 'Unknown error occurred',
+      error: errorMessage,
     });
-
-    return { success: false, error: error.message || 'Unknown error occurred' };
   } finally {
     clearInterval(extendLockInterval);
+    logger.info(`🛑 Job processing finished.`);
   }
+  return jobResult;
 };
 
 // Start all workers
 (async () => {
   await Promise.all([
-    workerFun(getGenerateLlmsTxtQueue(), processGenerateLlmsTxtJobInternal),
+    workerFun(
+      getGenerateLlmsTxtQueue(),
+      processGenerateLlmsTxtJobInternal as any,
+    ),
   ]);
 
   console.log('All workers exited. Waiting for all jobs to finish...');

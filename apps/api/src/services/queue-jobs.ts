@@ -193,6 +193,8 @@ export async function addCrawlJobs(
       );
     }),
   );
+
+  return true;
 }
 
 export function waitForJob<T = unknown>(
