@@ -20,15 +20,12 @@ export const auth = betterAuth({
       if (ctx.path.startsWith('/sign-up')) {
         const newSession = ctx.context.newSession;
         if (newSession) {
-          await fetch('/api/auth/api-key/create', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+          await auth.api.createApiKey({
+            body: {
               name: 'Default',
+              prefix: 'cocr-',
               userId: newSession.user.id,
-            }),
+            },
           });
         }
       }
