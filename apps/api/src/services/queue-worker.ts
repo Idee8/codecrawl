@@ -15,10 +15,11 @@ import { updateGeneratedLlmsTxt } from '../lib/generate-llms-txt/redis';
 import {
   getLlmsTextFromCache,
   saveLlmsTxtToCache,
-} from '../lib/generate-llms-txt/index';
-import { runLlmsTxtAction } from '../core/actions/llmsTxtAction';
-import { runComprehensiveLlmsTxtAction } from '../core/actions/runComprehensiveLlmsTxtAction';
-import type { CrawlOptions } from '../types';
+} from '../lib/generate-llms-txt';
+import {
+  runLlmsTxtAction,
+  runComprehensiveLlmsTxtAction,
+} from '../core/actions';
 
 /**
  * Globals
@@ -202,10 +203,6 @@ const processGenerateLlmsTxtJobInternal = async (
   try {
     logger.info(`🚀 Starting LLMs text generation job`, { showFullText });
 
-    const crawlOptions: Partial<CrawlOptions> = {
-      topFilesLen: maxUrls,
-    };
-
     const effectiveMaxUrls = Math.min(maxUrls ?? 5000, 5000);
     logger.info('Checking cache...');
     const cachedResult = await getLlmsTextFromCache(url, effectiveMaxUrls);
@@ -238,15 +235,20 @@ const processGenerateLlmsTxtJobInternal = async (
 
     if (showFullText) {
       logger.info('Running Comprehensive Action...');
-      actionResult = await runComprehensiveLlmsTxtAction(
-        url,
-        crawlOptions as CrawlOptions,
-      );
+      actionResult = await runComprehensiveLlmsTxtAction(url, {
+        fileSummary: true,
+        headerText: 'Comprehensive',
+      });
       generatedText = actionResult.comprehensiveText;
       fullText = actionResult.comprehensiveText;
     } else {
       logger.info('Running Standard Action...');
-      actionResult = await runLlmsTxtAction(url, crawlOptions as CrawlOptions);
+      actionResult = await runLlmsTxtAction(url, {
+        compress: true,
+        removeComments: true,
+        removeEmptyLines: true,
+        topFilesLen: 5,
+      });
       generatedText = actionResult.llmsTxt;
       fullText = actionResult.llmsTxt;
     }
