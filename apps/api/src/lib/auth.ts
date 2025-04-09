@@ -1,6 +1,6 @@
-import { betterAuth } from 'better-auth';
+import { betterAuth, logger } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { admin, apiKey, openAPI } from 'better-auth/plugins';
+import { admin, apiKey, openAPI, organization } from 'better-auth/plugins';
 import { createAuthMiddleware } from 'better-auth/api';
 
 import { db } from '../db';
@@ -19,12 +19,36 @@ export const auth = betterAuth({
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path.startsWith('/sign-up')) {
         const newSession = ctx.context.newSession;
-        if (newSession) {
+
+        if (newSession?.session && newSession.user) {
+          let organizationIdToStore: string | null = null;
+          try {
+            const activeOrganizationId = (newSession.session as any)
+              .activeOrganizationId;
+
+            if (activeOrganizationId) {
+              organizationIdToStore = activeOrganizationId;
+            } else {
+              logger.warn(
+                `No activeOrganizationId found on session for user ${newSession.user.id}`,
+              );
+            }
+          } catch (err) {
+            logger.error(
+              'Error getting activeOrganizationId during sign-up hook:',
+              err,
+            );
+          }
+
           await auth.api.createApiKey({
             body: {
               name: 'Default',
               prefix: 'cocr-',
               userId: newSession.user.id,
+              metadata: {
+                plan: 'free',
+                teamId: organizationIdToStore,
+              },
             },
           });
         }
@@ -32,10 +56,13 @@ export const auth = betterAuth({
     }),
   },
   plugins: [
-    apiKey(),
+    apiKey({
+      enableMetadata: true,
+    }),
     openAPI({
       disableDefaultReference: process.env.NODE_ENV === 'production',
     }),
     admin(),
+    organization(),
   ],
 });

@@ -71,9 +71,9 @@ function makePlanKey(plan?: string) {
 
 export function getRateLimiterPoints(
   mode: RateLimiterMode,
-  token?: string,
+  _token?: string,
   plan?: string,
-  teamId?: string,
+  _teamId?: string,
 ) {
   const rateLimitConfig = RATE_LIMITS[mode];
 
@@ -99,7 +99,7 @@ export function getRateLimiter(
 
 export function getConcurrencyLimitMax(
   plan: PlanType,
-  teamId?: string,
+  _teamId?: string,
 ): number {
   return CONCURRENCY_LIMIT[plan] ?? 10;
 }
