@@ -1,5 +1,4 @@
-import type { Response } from 'express';
-import type { RequestWithApiKey } from '../types';
+import type { Request, Response } from 'express';
 import {
   getGeneratedLLmsTxt,
   getGeneratedLlmsTxtExpiry,
@@ -10,7 +9,7 @@ interface StatusParams {
 }
 
 export async function generateLLMsTextStatusController(
-  req: RequestWithApiKey<StatusParams>,
+  req: Request<StatusParams, any>,
   res: Response,
 ) {
   const generation = await getGeneratedLLmsTxt(req.params.jobId);

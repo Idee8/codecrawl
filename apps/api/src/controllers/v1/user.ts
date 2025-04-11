@@ -1,12 +1,28 @@
-import { fromNodeHeaders } from 'better-auth/node';
+import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 
-import { auth } from '../../lib/auth';
+import { db } from '../../db';
+import { apiKeys, users } from '../../db/schema';
 
 export async function userMeController(req: Request, res: Response) {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
+  const userId = req.userId;
+  if (!userId) {
+    return res.status(401).json({ user: null });
+  }
+  const [user] = await db.select().from(users).where(eq(users.id, userId));
+  return res.json({ user: user });
+}
 
-  return res.json(session);
+export async function userApiKeysController(req: Request, res: Response) {
+  const userId = req.userId;
+
+  if (!userId) {
+    return res.status(401).json({ keys: [] });
+  }
+
+  const keys = await db
+    .select()
+    .from(apiKeys)
+    .where(eq(apiKeys.userId, userId));
+  return res.json({ keys });
 }

@@ -6,12 +6,10 @@ import CacheableLookup from 'cacheable-lookup';
 import http from 'node:http';
 import https from 'node:https';
 import os from 'node:os';
-import { toNodeHandler } from 'better-auth/node';
 
 import { v1Router } from './routes/v1';
 import { logger } from './lib/logger';
 import { runRemoteAction } from './core/actions/remoteAction';
-import { auth } from './lib/auth';
 
 const numCPUs = process.env.NODE_ENV === 'production' ? os.cpus().length : 2;
 
@@ -28,7 +26,7 @@ const app = ws.app;
 global.isProduction = process.env.IS_PRODUCTION === 'true';
 
 // Must be placed before express.json()
-app.all('/api/auth/*splat', toNodeHandler(auth));
+// app.all('/api/auth/*splat', toNodeHandler(auth));
 
 app.use(
   cors({

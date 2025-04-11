@@ -4,6 +4,14 @@ export type CrawlProgressCallback = (message: string) => void;
 
 export type PlanType = 'standard' | 'scale' | 'hobby' | 'growth' | 'free';
 
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+    }
+  }
+}
+
 export interface CrawlOptions {
   // Codecrawl Cloud Options
   teamId?: string;
