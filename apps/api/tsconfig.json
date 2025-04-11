@@ -1,46 +1,20 @@
 {
   "compilerOptions": {
-    // Project structure
     "rootDir": "./src",
-    "outDir": "./dist",
-    "baseUrl": ".",
+    "lib": ["ES2022", "DOM"],
 
-    // Module resolution
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "esModuleInterop": true,
-
-    // Compilation target
+    // or higher
     "target": "ES2022",
-    "lib": ["ES2022"],
 
-    // Type checking
-    "strict": true,
-    "noImplicitAny": false,
-    "noImplicitThis": true,
-    "useUnknownInCatchVariables": true,
-    "alwaysStrict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": false,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-
-    // Source maps and debugging
+    "module": "CommonJS",
+    "esModuleInterop": true,
     "sourceMap": true,
-    "inlineSources": true,
-    "declaration": false,
-    "declarationMap": false,
+    "outDir": "./dist",
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "strictNullChecks": true,
 
-    // Additional features
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "inlineSources": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "coverage"]
