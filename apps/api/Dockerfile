@@ -8,10 +8,10 @@ COPY . /app
 WORKDIR /app
 
 FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter api --prod --frozen-lockfile
 
 FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install && pnpm run build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter api && pnpm run build
 
 
 FROM base
