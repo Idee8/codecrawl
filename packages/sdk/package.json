@@ -1,0 +1,61 @@
+{
+  "name": "@codecrawl/sdk",
+  "version": "0.0.1",
+  "description": "Codecrawl SDK for Codecrawl API",
+  "main": "dist/index.js",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "build-and-publish": "npm run build && npm publish --access public",
+    "publish-beta": "npm run build && npm publish --access public --tag beta",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --verbose src/__tests__/index.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Idee8/codecrawl.git"
+  },
+  "author": "Irere Emmanuel <irere2020@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Idee8/codecrawl/issues"
+  },
+  "homepage": "https://github.com/Idee8/codecrawl#readme",
+  "dependencies": {
+    "axios": "^1.8.4",
+    "dotenv": "^16.4.7",
+    "uuid": "^11.1.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/axios": "^0.14.4",
+    "@types/jest": "^29.5.14",
+    "@types/mocha": "^10.0.10",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2"
+  },
+  "keywords": [
+    "codecrawl",
+    "codecrawl-sdk",
+    "codebase-indexer",
+    "codebase-crawler",
+    "api",
+    "sdk",
+    "repositories",
+    "llms"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
