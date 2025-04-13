@@ -7,6 +7,7 @@ export type QueueFunction = () => Queue<any, any, string, any, any, string>;
 let crawlQueue: Queue;
 let generateLlmsTxtQueue: Queue;
 let billingQueue: Queue;
+let treeQueue: Queue;
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL environment variable is missing...');
@@ -17,6 +18,7 @@ export const redisConnection = new IORedis(process.env.REDIS_URL, {
 });
 
 export const indexStoreQueueName = '{indexQueue}';
+export const treeQueueName = '{treeQueue}';
 export const generateLlmsTxtQueueName = '{generateLlmsTextQueue}';
 export const crawlQueueName = '{crawlQueue}';
 export const billingQueueName = '{billingQueue}';
@@ -73,4 +75,22 @@ export function getBillingQueue() {
     logger.info('Billing queue created');
   }
   return billingQueue;
+}
+
+export function getGenerateTreeQueue() {
+  if (!treeQueue) {
+    treeQueue = new Queue(treeQueueName, {
+      connection: redisConnection,
+      defaultJobOptions: {
+        removeOnComplete: {
+          age: 90000, // 25 hours
+        },
+        removeOnFail: {
+          age: 90000, // 25 hours
+        },
+      },
+    });
+    logger.info('Tree generation queue created');
+  }
+  return treeQueue;
 }

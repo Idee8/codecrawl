@@ -3,7 +3,11 @@ import { Worker, type Job, type Queue } from 'bullmq';
 import { v4 as uuidv4 } from 'uuid';
 
 import { logger as _logger } from '../lib/logger';
-import { getGenerateLlmsTxtQueue, redisConnection } from './queue-service';
+import {
+  getGenerateLlmsTxtQueue,
+  getGenerateTreeQueue,
+  redisConnection,
+} from './queue-service';
 import systemMonitor from './system-monitor';
 import {
   cleanOldConcurrencyLimitEntries,
@@ -19,7 +23,9 @@ import {
 import {
   runLlmsTxtAction,
   runComprehensiveLlmsTxtAction,
+  runFileTreeAction,
 } from '../core/actions';
+import { updateTreeGenerationDataStatus } from '../lib/generate-tree';
 
 /**
  * Globals
@@ -299,6 +305,98 @@ const processGenerateLlmsTxtJobInternal = async (
   return jobResult;
 };
 
+/**
+ * Job Processor for File Tree Generation
+ */
+const processTreeJobInternal = async (
+  token: string,
+  job: Job & { id: string },
+): Promise<{ success: boolean; data?: any; error?: string }> => {
+  const { url, generationId, userId } = job.data; // Extract necessary data
+
+  const logger = _logger.child({
+    module: 'generate-tree-worker',
+    method: 'processTreeJobInternal',
+    jobId: job.id,
+    generationId,
+    userId: userId ?? undefined, // Include userId if present
+    url: url,
+  });
+
+  const extendLockInterval = setInterval(async () => {
+    try {
+      logger.info(`🔄 Worker extending lock on job ${job.id}`);
+      await job.extendLock(token, jobLockExtensionTime);
+    } catch (lockError) {
+      logger.error(`Failed to extend lock for job ${job.id}`, { lockError });
+    }
+  }, jobLockExtendInterval);
+
+  let jobResult: { success: boolean; data?: any; error?: string } = {
+    success: false,
+    error: 'Processing did not complete',
+  };
+
+  try {
+    logger.info(`🚀 Starting File Tree generation job`);
+
+    await updateTreeGenerationDataStatus(generationId, 'processing');
+
+    const tree = await runFileTreeAction(url, {});
+
+    logger.info('File Tree action completed.');
+
+    await updateTreeGenerationDataStatus(
+      generationId,
+      'completed',
+      tree.treeString,
+    );
+
+    jobResult = {
+      success: true,
+      data: { tree },
+    };
+    await job.moveToCompleted(jobResult, token, false);
+    logger.info(`✅ Job completed successfully`);
+  } catch (error) {
+    logger.error(`🚫 Job errored`, { error });
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'Unknown error during processing';
+    jobResult = { success: false, error: errorMessage };
+
+    try {
+      await updateTreeGenerationDataStatus(
+        generationId,
+        'failed',
+        errorMessage,
+      );
+    } catch (statusUpdateError) {
+      logger.error('Failed to update job status to failed in storage', {
+        statusUpdateError,
+      });
+    }
+
+    try {
+      await job.moveToFailed(
+        error instanceof Error ? error : new Error(errorMessage),
+        token,
+        false,
+      );
+    } catch (moveError) {
+      logger.error('Failed to move job to failed state in queue', {
+        moveError,
+      });
+    }
+  } finally {
+    clearInterval(extendLockInterval);
+    logger.info(`🛑 Job processing finished.`);
+  }
+
+  return jobResult;
+};
+
 // Start all workers
 (async () => {
   await Promise.all([
@@ -306,6 +404,7 @@ const processGenerateLlmsTxtJobInternal = async (
       getGenerateLlmsTxtQueue(),
       processGenerateLlmsTxtJobInternal as any,
     ),
+    workerFun(getGenerateTreeQueue(), processTreeJobInternal as any),
   ]);
 
   console.log('All workers exited. Waiting for all jobs to finish...');

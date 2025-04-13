@@ -13,6 +13,8 @@ import { livenessController } from '../controllers/v1/liveness';
 import { readinessController } from '../controllers/v1/readiness';
 import { login, register } from '../controllers/v1/auth';
 import { teamKeysController } from '../controllers/v1/teams';
+import { generateTreeStatusController } from '../controllers/v1/generate-tree-status';
+import { generateTreeController } from '../controllers/v1/generate-tree';
 
 expressWs(express());
 
@@ -38,4 +40,15 @@ v1Router.get(
   '/llmstxt/:jobId',
   apiKeyAuthMiddleware(RateLimiterMode.CrawlStatus),
   wrap(generateLLMsTextStatusController as any),
+);
+
+v1Router.post(
+  '/tree',
+  apiKeyAuthMiddleware(RateLimiterMode.Crawl),
+  wrap(generateTreeController),
+);
+v1Router.get(
+  '/tree/:jobId',
+  apiKeyAuthMiddleware(RateLimiterMode.CrawlStatus),
+  wrap(generateTreeStatusController as any),
 );

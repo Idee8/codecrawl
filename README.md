@@ -169,37 +169,37 @@ Response:
 }
 ```
 
-### FileTree
+### Generate FileTree
 
-Used to get the file tree of the whole repository using its URL. This returns markdown, plain, or html for the file tree of the repo
-
+Used to get the file tree of the whole repository using its URL. This returns plain tree for given repository. 
 ```bash cURL
 curl -X POST https://api.irere.dev/v1/tree \
     -H 'Content-Type: application/json' \
     -H 'Authorization: Bearer YOUR_API_KEY' \
     -d '{
       "url": "https://github.com/irere123/run-lang", 
-      "formats: ["markdown", "plain"]
     }'
 ```
 
-Response:
+### Check FileTree Job
+
+Check the status and retrieve the content of a `/v1/tree` generation job using the job ID.
+
+```bash
+curl -X GET https://api.irere.dev/v1/tree/123-456-789 \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer YOUR_API_KEY'
+```
+
+Returns the status and data of the `/v1/tree` generation job.
 
 ```json
 {
-  "status": "success",
-  "data": [
-   {
-     "markdown": "File structure in markdown....", // if specified as the return type
-      "html": "File structure in html", // if specified as the return type
-      "plain": "File structure in plain text", // if specified as the return type
-      "data": {
-        "tree": "[filetree]...",
-        "repository": "https://github.com/irere123/run-lang",
-        "statusCode": 200
-      }
-   }
-  ]
+  "success": true,
+  "status": "completed",
+  "data": {
+    "tree": "Repository filetree..."
+  }
 }
 ```
 
