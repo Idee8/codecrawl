@@ -7,12 +7,6 @@ Empower your AI apps with clean data from any repository. Featuring advanced cod
 
 [Codecrawl](https://crawl.irere.dev?ref=github) is an API service that takes a repository URL, crawls it, and converts it into clean markdown or structured data, generate embeddings then store them in a vector database. We currently support only public codebases accessible on different codehosts like GitHub and Gitlab and give you clean data for each.
 
-_Pst. hey, you, join our stargazers :)_
-
-<a href="https://github.com/Idee8/codecrawl">
-  <img src="https://img.shields.io/github/stars/Idee8/codecrawl.svg?style=social&label=Star&maxAge=2592000" alt="GitHub stars">
-</a>
-
 ## How to use it?
 
 We will provide an easy to use API with our hosted version. You can find the playground and documentation [here](https://crawl.irere.dev/playground). You can also self host the backend if you'd like.
@@ -26,11 +20,11 @@ To run locally, refer to guide [here](https://github.com/Idee8/codecrawl/blob/ma
 
 ### API Key
 
-To use the API, you need to sign up on [CodeCrawl](https://crawl.irere.dev) and get an API key.
+To use the API, you need to sign up on [Codecrawl](https://crawl.irere.dev) and get an API key.
 
 ### Features
 
-- [**File Structure**](#filetree): Get repository file structure with search capabilities
+- [**File Structure**](#filetree): Get repository file structure to feed to LLMs.
 - [**LLMs.txt**](#llms.txt): Generate a Llms.txt to feed directly to any model
 - [**Extract**](#indexing): Get structured data from single repo, multiple repo with the help AI.
 - [**Search**](#search): Search repository content with semantic understanding
