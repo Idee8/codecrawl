@@ -13,16 +13,27 @@ _Pst. hey, you, join our stargazers :)_
   <img src="https://img.shields.io/github/stars/Idee8/codecrawl.svg?style=social&label=Star&maxAge=2592000" alt="GitHub stars">
 </a>
 
+## How to use it?
+
+We will provide an easy to use API with our hosted version. You can find the playground and documentation [here](https://crawl.irere.dev/playground). You can also self host the backend if you'd like.
+
+Check out the following resources to get started:
+- [x] **API**: [Documentation](#cooming-soon)
+- [x] **SDKs**: [Node](https://github.com/Idee8/codecrawl/blob/main/packages/sdk)
+- [ ] Want an SDK or Integration? Let us know by opening an issue.
+
+To run locally, refer to guide [here](https://github.com/Idee8/codecrawl/blob/main/CONTRIBUTING.md).
+
 ### API Key
 
 To use the API, you need to sign up on [CodeCrawl](https://crawl.irere.dev) and get an API key.
 
 ### Features
 
-- [**Index**](#indexing): Index repository content and get clean data in multiple formats (markdown, XML, plain text)
-- [**Tree**](#filetree): Get repository file structure with search capabilities
-- [**Search**](#search): Search repository content with semantic understanding
+- [**File Structure**](#filetree): Get repository file structure with search capabilities
 - [**LLMs.txt**](#llms.txt): Generate a Llms.txt to feed directly to any model
+- [**Extract**](#indexing): Get structured data from single repo, multiple repo with the help AI.
+- [**Search**](#search): Search repository content with semantic understanding
 - [**Batch**](#batch-indexing-multiple-urls): Process multiple repositories simultaneously
 
 ### Powerful Capabilities
