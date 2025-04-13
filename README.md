@@ -1,6 +1,6 @@
 # 📒 Codecrawl
 
-Empower your AI apps with clean data from any repository. Featuring advanced codebase indexing, semantic search, and data extraction capabilities.
+Empower your AI apps with clean data from any repository. Featuring advanced codebase file-trees, semantic search, llms.txt and data extraction capabilities.
 
 
 ## What is Codecrawl?
@@ -32,38 +32,6 @@ To use the API, you need to sign up on [CodeCrawl](https://crawl.irere.dev) and 
 - **Repository Analytics**: Get insights on file sizes, token counts and top files
 - **Scalable Processing**: Handle large codebases with configurable limits and batch operations
 - **Clean Data**: Remove comments, empty lines and get compressed output as needed
-
-
-### Indexing 
-
-Used to index a repository using its URL and get repository file tree and content. This submits a crawl job and returns a job ID to check the status of the indexing.
-
-```bash
-# the limits the number of files to index to a 100
-curl -X POST https://api.irere.dev/v1/index \
-    -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer fc-YOUR_API_KEY' \
-    -d '{
-      "url": "https://github.com/irere123/run-lang",
-      "limit": 100,
-      "compress": false,
-      "comments": false,
-      "emptyLines": false,
-      "scrapeOptions": {
-        "formats": ["markdown", "xml", "plain"]
-      }
-    }'
-```
-
-Returns a indexing job id and the url to check the status of the index.
-
-```json
-{
-  "success": true,
-  "id": "123-456-789",
-  "url": "https://api.irere.dev/v1/index/123-456-789"
-}
-```
 
 
 ### LLMs.txt
@@ -110,65 +78,6 @@ Returns the status and data of the `llms.txt` generation job.
 }
 ```
 
-
-### Check Index Job
-
-Used to check the status of a index job and get its result.
-
-```bash
-curl -X GET https://api.irere.dev/v1/index/123-456-789 \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer YOUR_API_KEY'
-```
-
-```json
-{
-  "status": "completed",
-  "total": 36,
-  "creditsUsed": 36,
-  "expiresAt": "2024-00-00T00:00:00.000Z",
-  "data": [
-    {
-      "markdown": "Codebase content in markdown format",
-      "xml": "Codebase content in xml format",
-      "plain": "Codebase content in plain text format",
-      "metadata": {
-        "topFiles": [
-            {
-                "chars": 3232, 
-                "name":"src/components/landing.tsx",
-                "tokens": 2123, 
-                "percentage": 32
-            }
-        ],
-        "repository": "https://github.com/irere123/run-lang",
-        "totalSize": 323232, // characters
-        "totalTokens": 545464, // tokens
-        "totalFiles": 123, // number of files
-        "statusCode": 200
-      }
-    }
-  ]
-}
-```
-
-Response:
-
-```json
-{
-  "success": true,
-  "data": {
-    "markdown": "[Readme file content in markdown format]...",
-    "xml": "[Readme file content in xml format]...",
-    "metadata": {
-      "title": "Run Programming Language",
-      "description": "[Experimental] Object-oriented, compiled, VM-based language designed for optimal performance and portability across different environments.",
-      // other structured data extracted and formated using LLMs
-    }
-  }
-}
-```
-
 ### Generate FileTree
 
 Used to get the file tree of the whole repository using its URL. This returns plain tree for given repository. 
@@ -202,77 +111,6 @@ Returns the status and data of the `/v1/tree` generation job.
   }
 }
 ```
-
-#### Map with search
-
-Map with `search` param allows you to search for specific keyword inside a repository file structure.
-
-```bash cURL
-curl -X POST https://api.irere.dev/v1/map \
-    -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer YOUR_API_KEY' \
-    -d '{
-      "url": "https://github.com/irere123/run-lang",
-      "search": "docs"
-    }'
-```
-
-Response will be an ordered list from the most relevant to the least relevant.
-
-```json
-{
-  "status": "success",
-  "results": [
-    "src/components/input.tsx",
-    "src/components/main.tsx",
-    "src/components/markdown.tsx",
-  ]
-}
-```
-
-### Batch Indexing Multiple URLs
-
-You can now batch index multiple URLs at the same time. It is very similar to how the /index endpoint works. It submits a batch indexing job and returns a job ID to check the status of the batch index.
-
-```bash
-curl -X POST https://api.irere.dev/v1/batch/index \
-    -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer YOUR_API_KEY' \
-    -d '{
-      "urls": ["https://github.com/irere123/run-lang", "https://github.com/irere123/relaunch"],
-      "formats" : ["markdown", "xml"]
-    }'
-```
-
-### Search
-
-The search endpoint combines web search with Codecrawl's indexing capabilities to return full repository content for any query.
-
-Include `indexOptions` with `formats: ["markdown"]` to get complete markdown content for each search result otherwise it defaults to getting SERP results (repository, title, description).
-
-```bash
-curl -X POST https://api.irere.dev/v1/search \
-    -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer YOUR_API_KEY' \
-    -d '{
-        "url": "http://github.com/Idee8/codecrawl",
-        "query": "What is Codecrawl?"
-    }'
-```
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "repository": "https://github.com/Idee8/codecrawl",
-      "title": "Codecrawl",
-      "description": "Turn entire repository into LLM-ready markdown or structured data. Search, index and extract with a single API."
-    }
-  ]
-}
-```
-
 
 ## Contributing
 
