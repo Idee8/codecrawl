@@ -9,7 +9,7 @@ import {
 } from '@radix-ui/themes';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
-import { Logo } from '~/components/Logo';
+import { Logo } from '~/components/logo';
 
 export const Route = createFileRoute('/(auth)/_auth/signin')({
   component: RouteComponent,

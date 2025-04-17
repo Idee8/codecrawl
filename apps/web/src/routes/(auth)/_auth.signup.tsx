@@ -9,7 +9,7 @@ import {
   TextField,
 } from '@radix-ui/themes';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Logo } from '~/components/Logo';
+import { Logo } from '~/components/logo';
 
 export const Route = createFileRoute('/(auth)/_auth/signup')({
   component: RouteComponent,
