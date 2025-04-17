@@ -15,16 +15,27 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as RedirectImport } from './routes/redirect'
 import { Route as IndexImport } from './routes/index'
-import { Route as AppIndexImport } from './routes/app/index'
+import { Route as AppAppImport } from './routes/app/_app'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
+import { Route as AppAppIndexImport } from './routes/app/_app/index'
+import { Route as AppAppPlaygroundImport } from './routes/app/_app/playground'
+import { Route as AppAppLogsImport } from './routes/app/_app/logs'
+import { Route as AppAppKeysImport } from './routes/app/_app/keys'
 import { Route as authAuthSignupImport } from './routes/(auth)/_auth.signup'
 import { Route as authAuthSigninImport } from './routes/(auth)/_auth.signin'
 
 // Create Virtual Routes
 
+const AppImport = createFileRoute('/app')()
 const authImport = createFileRoute('/(auth)')()
 
 // Create/Update Routes
+
+const AppRoute = AppImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const authRoute = authImport.update({
   id: '/(auth)',
@@ -43,15 +54,38 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AppIndexRoute = AppIndexImport.update({
-  id: '/app/',
-  path: '/app/',
-  getParentRoute: () => rootRoute,
+const AppAppRoute = AppAppImport.update({
+  id: '/_app',
+  getParentRoute: () => AppRoute,
 } as any)
 
 const authAuthRoute = authAuthImport.update({
   id: '/_auth',
   getParentRoute: () => authRoute,
+} as any)
+
+const AppAppIndexRoute = AppAppIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAppRoute,
+} as any)
+
+const AppAppPlaygroundRoute = AppAppPlaygroundImport.update({
+  id: '/playground',
+  path: '/playground',
+  getParentRoute: () => AppAppRoute,
+} as any)
+
+const AppAppLogsRoute = AppAppLogsImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AppAppRoute,
+} as any)
+
+const AppAppKeysRoute = AppAppKeysImport.update({
+  id: '/keys',
+  path: '/keys',
+  getParentRoute: () => AppAppRoute,
 } as any)
 
 const authAuthSignupRoute = authAuthSignupImport.update({
@@ -98,12 +132,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuthImport
       parentRoute: typeof authRoute
     }
-    '/app/': {
-      id: '/app/'
+    '/app': {
+      id: '/app'
       path: '/app'
       fullPath: '/app'
-      preLoaderRoute: typeof AppIndexImport
+      preLoaderRoute: typeof AppImport
       parentRoute: typeof rootRoute
+    }
+    '/app/_app': {
+      id: '/app/_app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppAppImport
+      parentRoute: typeof AppRoute
     }
     '/(auth)/_auth/signin': {
       id: '/(auth)/_auth/signin'
@@ -118,6 +159,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/signup'
       preLoaderRoute: typeof authAuthSignupImport
       parentRoute: typeof authAuthImport
+    }
+    '/app/_app/keys': {
+      id: '/app/_app/keys'
+      path: '/keys'
+      fullPath: '/app/keys'
+      preLoaderRoute: typeof AppAppKeysImport
+      parentRoute: typeof AppAppImport
+    }
+    '/app/_app/logs': {
+      id: '/app/_app/logs'
+      path: '/logs'
+      fullPath: '/app/logs'
+      preLoaderRoute: typeof AppAppLogsImport
+      parentRoute: typeof AppAppImport
+    }
+    '/app/_app/playground': {
+      id: '/app/_app/playground'
+      path: '/playground'
+      fullPath: '/app/playground'
+      preLoaderRoute: typeof AppAppPlaygroundImport
+      parentRoute: typeof AppAppImport
+    }
+    '/app/_app/': {
+      id: '/app/_app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppAppIndexImport
+      parentRoute: typeof AppAppImport
     }
   }
 }
@@ -148,20 +217,54 @@ const authRouteChildren: authRouteChildren = {
 
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
 
+interface AppAppRouteChildren {
+  AppAppKeysRoute: typeof AppAppKeysRoute
+  AppAppLogsRoute: typeof AppAppLogsRoute
+  AppAppPlaygroundRoute: typeof AppAppPlaygroundRoute
+  AppAppIndexRoute: typeof AppAppIndexRoute
+}
+
+const AppAppRouteChildren: AppAppRouteChildren = {
+  AppAppKeysRoute: AppAppKeysRoute,
+  AppAppLogsRoute: AppAppLogsRoute,
+  AppAppPlaygroundRoute: AppAppPlaygroundRoute,
+  AppAppIndexRoute: AppAppIndexRoute,
+}
+
+const AppAppRouteWithChildren =
+  AppAppRoute._addFileChildren(AppAppRouteChildren)
+
+interface AppRouteChildren {
+  AppAppRoute: typeof AppAppRouteWithChildren
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAppRoute: AppAppRouteWithChildren,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof authAuthRouteWithChildren
   '/redirect': typeof RedirectRoute
-  '/app': typeof AppIndexRoute
+  '/app': typeof AppAppRouteWithChildren
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
+  '/app/keys': typeof AppAppKeysRoute
+  '/app/logs': typeof AppAppLogsRoute
+  '/app/playground': typeof AppAppPlaygroundRoute
+  '/app/': typeof AppAppIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof authAuthRouteWithChildren
   '/redirect': typeof RedirectRoute
-  '/app': typeof AppIndexRoute
+  '/app': typeof AppAppIndexRoute
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
+  '/app/keys': typeof AppAppKeysRoute
+  '/app/logs': typeof AppAppLogsRoute
+  '/app/playground': typeof AppAppPlaygroundRoute
 }
 
 export interface FileRoutesById {
@@ -170,25 +273,52 @@ export interface FileRoutesById {
   '/redirect': typeof RedirectRoute
   '/(auth)': typeof authRouteWithChildren
   '/(auth)/_auth': typeof authAuthRouteWithChildren
-  '/app/': typeof AppIndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/_app': typeof AppAppRouteWithChildren
   '/(auth)/_auth/signin': typeof authAuthSigninRoute
   '/(auth)/_auth/signup': typeof authAuthSignupRoute
+  '/app/_app/keys': typeof AppAppKeysRoute
+  '/app/_app/logs': typeof AppAppLogsRoute
+  '/app/_app/playground': typeof AppAppPlaygroundRoute
+  '/app/_app/': typeof AppAppIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/redirect' | '/app' | '/signin' | '/signup'
+  fullPaths:
+    | '/'
+    | '/redirect'
+    | '/app'
+    | '/signin'
+    | '/signup'
+    | '/app/keys'
+    | '/app/logs'
+    | '/app/playground'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/redirect' | '/app' | '/signin' | '/signup'
+  to:
+    | '/'
+    | '/redirect'
+    | '/app'
+    | '/signin'
+    | '/signup'
+    | '/app/keys'
+    | '/app/logs'
+    | '/app/playground'
   id:
     | '__root__'
     | '/'
     | '/redirect'
     | '/(auth)'
     | '/(auth)/_auth'
-    | '/app/'
+    | '/app'
+    | '/app/_app'
     | '/(auth)/_auth/signin'
     | '/(auth)/_auth/signup'
+    | '/app/_app/keys'
+    | '/app/_app/logs'
+    | '/app/_app/playground'
+    | '/app/_app/'
   fileRoutesById: FileRoutesById
 }
 
@@ -196,14 +326,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RedirectRoute: typeof RedirectRoute
   authRoute: typeof authRouteWithChildren
-  AppIndexRoute: typeof AppIndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RedirectRoute: RedirectRoute,
   authRoute: authRouteWithChildren,
-  AppIndexRoute: AppIndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -219,7 +349,7 @@ export const routeTree = rootRoute
         "/",
         "/redirect",
         "/(auth)",
-        "/app/"
+        "/app"
       ]
     },
     "/": {
@@ -242,8 +372,21 @@ export const routeTree = rootRoute
         "/(auth)/_auth/signup"
       ]
     },
-    "/app/": {
-      "filePath": "app/index.tsx"
+    "/app": {
+      "filePath": "app",
+      "children": [
+        "/app/_app"
+      ]
+    },
+    "/app/_app": {
+      "filePath": "app/_app.tsx",
+      "parent": "/app",
+      "children": [
+        "/app/_app/keys",
+        "/app/_app/logs",
+        "/app/_app/playground",
+        "/app/_app/"
+      ]
     },
     "/(auth)/_auth/signin": {
       "filePath": "(auth)/_auth.signin.tsx",
@@ -252,6 +395,22 @@ export const routeTree = rootRoute
     "/(auth)/_auth/signup": {
       "filePath": "(auth)/_auth.signup.tsx",
       "parent": "/(auth)/_auth"
+    },
+    "/app/_app/keys": {
+      "filePath": "app/_app/keys.tsx",
+      "parent": "/app/_app"
+    },
+    "/app/_app/logs": {
+      "filePath": "app/_app/logs.tsx",
+      "parent": "/app/_app"
+    },
+    "/app/_app/playground": {
+      "filePath": "app/_app/playground.tsx",
+      "parent": "/app/_app"
+    },
+    "/app/_app/": {
+      "filePath": "app/_app/index.tsx",
+      "parent": "/app/_app"
     }
   }
 }

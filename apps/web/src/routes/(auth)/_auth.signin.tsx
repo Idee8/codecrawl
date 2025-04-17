@@ -1,6 +1,15 @@
-import { Box, Button, Card, Flex, Text, TextField } from '@radix-ui/themes';
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  Flex,
+  Text,
+  TextField,
+} from '@radix-ui/themes';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { Logo } from '~/components/Logo';
 
 export const Route = createFileRoute('/(auth)/_auth/signin')({
   component: RouteComponent,
@@ -12,9 +21,7 @@ function RouteComponent() {
       <Card size="1" className="p-4" variant="classic">
         <Flex direction="column" gap="5" p={'4'}>
           <Flex direction="column" gap="2">
-            <Text size={'6'} weight={'bold'}>
-              Codecrawl
-            </Text>
+            <Avatar fallback={<Logo />} color="gray" mb={'4'} />
             <Text size={'5'} weight={'medium'}>
               Sign in to your account
             </Text>
@@ -46,7 +53,12 @@ function RouteComponent() {
                 Forgot password?
               </Text>
             </Flex>
-            <TextField.Root placeholder="Enter your password" size="3" mt={'2'}>
+            <TextField.Root
+              placeholder="Enter your password"
+              size="3"
+              mt={'2'}
+              type="password"
+            >
               <TextField.Slot>
                 <LockClosedIcon height="16" width="16" />
               </TextField.Slot>
