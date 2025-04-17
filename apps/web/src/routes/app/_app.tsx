@@ -1,9 +1,15 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { Flex, Separator } from '@radix-ui/themes';
 import { Sidebar } from '~/components/sidebar';
+import { seo } from '~/utils/seo';
 
 export const Route = createFileRoute('/app/_app')({
   component: RouteComponent,
+  head(ctx) {
+    return {
+      meta: [...seo({ title: 'Codecrawl' })],
+    };
+  },
 });
 
 function RouteComponent() {

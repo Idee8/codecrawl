@@ -1,8 +1,14 @@
 import { Box, Flex, Tabs, Text } from '@radix-ui/themes';
 import { createFileRoute } from '@tanstack/react-router';
+import { seo } from '~/utils/seo';
 
 export const Route = createFileRoute('/app/_app/playground')({
   component: RouteComponent,
+  head(ctx) {
+    return {
+      meta: [...seo({ title: 'Playground | Codecrawl' })],
+    };
+  },
 });
 
 function RouteComponent() {
@@ -22,7 +28,7 @@ function RouteComponent() {
         <Tabs.Root defaultValue="llms">
           <Tabs.List>
             <Tabs.Trigger value="llms">LLMs.txt</Tabs.Trigger>
-            <Tabs.Trigger value="filetree">FileTree</Tabs.Trigger>
+            <Tabs.Trigger value="filetree">File Tree</Tabs.Trigger>
             <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
           </Tabs.List>
 

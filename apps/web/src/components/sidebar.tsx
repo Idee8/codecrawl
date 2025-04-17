@@ -1,8 +1,12 @@
 import { KeyIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
 import { Avatar, DropdownMenu, Flex, Text } from '@radix-ui/themes';
 import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
+import { LogoutConfirm } from './logout-confirm';
 
 export function Sidebar() {
+  const [open, setOpen] = useState(false);
+
   return (
     <Flex
       gap={'4'}
@@ -37,17 +41,9 @@ export function Sidebar() {
             </DropdownMenu.Content>
           </DropdownMenu.Root>
           <Flex direction={'column'} gap={'3'} pt={'7'}>
-            <Text size={'2'} color="gray">
-              GENERAL
+            <Text size={'2'} color="gray" className="uppercase">
+              Workspace
             </Text>
-            <Flex gap={'2'} align={'center'}>
-              <KeyIcon
-                width={'20'}
-                height={'20'}
-                className="text-[var(--gray-9)]"
-              />
-              <Link to={'/app/keys'}>API Keys</Link>
-            </Flex>
             <Flex gap={'2'} align={'center'}>
               <PlayCircleIcon
                 width={'20'}
@@ -55,6 +51,14 @@ export function Sidebar() {
                 className="text-[var(--gray-9)]"
               />
               <Link to={'/app/playground'}>Playground</Link>
+            </Flex>
+            <Flex gap={'2'} align={'center'}>
+              <KeyIcon
+                width={'20'}
+                height={'20'}
+                className="text-[var(--gray-9)]"
+              />
+              <Link to={'/app/keys'}>API Keys</Link>
             </Flex>
           </Flex>
         </Flex>
@@ -75,7 +79,15 @@ export function Sidebar() {
               <DropdownMenu.Item>Profile</DropdownMenu.Item>
               <DropdownMenu.Item>Appearance</DropdownMenu.Item>
               <DropdownMenu.Separator />
-              <DropdownMenu.Item color="red">Logout</DropdownMenu.Item>
+              <LogoutConfirm
+                trigger={
+                  <DropdownMenu.Item color="red" onClick={() => setOpen(!open)}>
+                    Logout
+                  </DropdownMenu.Item>
+                }
+                open={open}
+                setOpen={setOpen}
+              />
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </Flex>

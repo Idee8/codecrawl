@@ -1,9 +1,15 @@
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Button, Flex, Table, Text } from '@radix-ui/themes';
 import { createFileRoute } from '@tanstack/react-router';
+import { seo } from '~/utils/seo';
 
 export const Route = createFileRoute('/app/_app/keys')({
   component: RouteComponent,
+  head(ctx) {
+    return {
+      meta: [...seo({ title: 'API Keys | Codecrawl' })],
+    };
+  },
 });
 
 function RouteComponent() {
