@@ -14,8 +14,9 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as RedirectImport } from './routes/redirect'
-import { Route as IndexImport } from './routes/index'
+import { Route as marketingIndexImport } from './routes/(marketing)/index'
 import { Route as AppAppImport } from './routes/app/_app'
+import { Route as marketingGithubImport } from './routes/(marketing)/github'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
 import { Route as AppAppIndexImport } from './routes/app/_app/index'
 import { Route as AppAppPlaygroundImport } from './routes/app/_app/playground'
@@ -48,8 +49,8 @@ const RedirectRoute = RedirectImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
-  id: '/',
+const marketingIndexRoute = marketingIndexImport.update({
+  id: '/(marketing)/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
@@ -57,6 +58,12 @@ const IndexRoute = IndexImport.update({
 const AppAppRoute = AppAppImport.update({
   id: '/_app',
   getParentRoute: () => AppRoute,
+} as any)
+
+const marketingGithubRoute = marketingGithubImport.update({
+  id: '/(marketing)/github',
+  path: '/github',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const authAuthRoute = authAuthImport.update({
@@ -104,13 +111,6 @@ const authAuthSigninRoute = authAuthSigninImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
     '/redirect': {
       id: '/redirect'
       path: '/redirect'
@@ -132,6 +132,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuthImport
       parentRoute: typeof authRoute
     }
+    '/(marketing)/github': {
+      id: '/(marketing)/github'
+      path: '/github'
+      fullPath: '/github'
+      preLoaderRoute: typeof marketingGithubImport
+      parentRoute: typeof rootRoute
+    }
     '/app': {
       id: '/app'
       path: '/app'
@@ -145,6 +152,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app'
       preLoaderRoute: typeof AppAppImport
       parentRoute: typeof AppRoute
+    }
+    '/(marketing)/': {
+      id: '/(marketing)/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof marketingIndexImport
+      parentRoute: typeof rootRoute
     }
     '/(auth)/_auth/signin': {
       id: '/(auth)/_auth/signin'
@@ -245,8 +259,9 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 export interface FileRoutesByFullPath {
-  '/': typeof authAuthRouteWithChildren
   '/redirect': typeof RedirectRoute
+  '/': typeof marketingIndexRoute
+  '/github': typeof marketingGithubRoute
   '/app': typeof AppAppRouteWithChildren
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
@@ -257,8 +272,9 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
-  '/': typeof authAuthRouteWithChildren
   '/redirect': typeof RedirectRoute
+  '/': typeof marketingIndexRoute
+  '/github': typeof marketingGithubRoute
   '/app': typeof AppAppIndexRoute
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
@@ -269,12 +285,13 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
   '/redirect': typeof RedirectRoute
   '/(auth)': typeof authRouteWithChildren
   '/(auth)/_auth': typeof authAuthRouteWithChildren
+  '/(marketing)/github': typeof marketingGithubRoute
   '/app': typeof AppRouteWithChildren
   '/app/_app': typeof AppAppRouteWithChildren
+  '/(marketing)/': typeof marketingIndexRoute
   '/(auth)/_auth/signin': typeof authAuthSigninRoute
   '/(auth)/_auth/signup': typeof authAuthSignupRoute
   '/app/_app/keys': typeof AppAppKeysRoute
@@ -286,8 +303,9 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/redirect'
+    | '/'
+    | '/github'
     | '/app'
     | '/signin'
     | '/signup'
@@ -297,8 +315,9 @@ export interface FileRouteTypes {
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/redirect'
+    | '/'
+    | '/github'
     | '/app'
     | '/signin'
     | '/signup'
@@ -307,12 +326,13 @@ export interface FileRouteTypes {
     | '/app/playground'
   id:
     | '__root__'
-    | '/'
     | '/redirect'
     | '/(auth)'
     | '/(auth)/_auth'
+    | '/(marketing)/github'
     | '/app'
     | '/app/_app'
+    | '/(marketing)/'
     | '/(auth)/_auth/signin'
     | '/(auth)/_auth/signup'
     | '/app/_app/keys'
@@ -323,17 +343,19 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   RedirectRoute: typeof RedirectRoute
   authRoute: typeof authRouteWithChildren
+  marketingGithubRoute: typeof marketingGithubRoute
   AppRoute: typeof AppRouteWithChildren
+  marketingIndexRoute: typeof marketingIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   RedirectRoute: RedirectRoute,
   authRoute: authRouteWithChildren,
+  marketingGithubRoute: marketingGithubRoute,
   AppRoute: AppRouteWithChildren,
+  marketingIndexRoute: marketingIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -346,14 +368,12 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
         "/redirect",
         "/(auth)",
-        "/app"
+        "/(marketing)/github",
+        "/app",
+        "/(marketing)/"
       ]
-    },
-    "/": {
-      "filePath": "index.tsx"
     },
     "/redirect": {
       "filePath": "redirect.tsx"
@@ -372,6 +392,9 @@ export const routeTree = rootRoute
         "/(auth)/_auth/signup"
       ]
     },
+    "/(marketing)/github": {
+      "filePath": "(marketing)/github.tsx"
+    },
     "/app": {
       "filePath": "app",
       "children": [
@@ -387,6 +410,9 @@ export const routeTree = rootRoute
         "/app/_app/playground",
         "/app/_app/"
       ]
+    },
+    "/(marketing)/": {
+      "filePath": "(marketing)/index.tsx"
     },
     "/(auth)/_auth/signin": {
       "filePath": "(auth)/_auth.signin.tsx",
