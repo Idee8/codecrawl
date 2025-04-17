@@ -8,14 +8,28 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as RedirectImport } from './routes/redirect'
-import { Route as PathlessLayoutImport } from './routes/_pathlessLayout'
 import { Route as IndexImport } from './routes/index'
+import { Route as AppIndexImport } from './routes/app/index'
+import { Route as authAuthImport } from './routes/(auth)/_auth'
+import { Route as authAuthSignupImport } from './routes/(auth)/_auth.signup'
+import { Route as authAuthSigninImport } from './routes/(auth)/_auth.signin'
+
+// Create Virtual Routes
+
+const authImport = createFileRoute('/(auth)')()
 
 // Create/Update Routes
+
+const authRoute = authImport.update({
+  id: '/(auth)',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const RedirectRoute = RedirectImport.update({
   id: '/redirect',
@@ -23,15 +37,33 @@ const RedirectRoute = RedirectImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const PathlessLayoutRoute = PathlessLayoutImport.update({
-  id: '/_pathlessLayout',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const AppIndexRoute = AppIndexImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const authAuthRoute = authAuthImport.update({
+  id: '/_auth',
+  getParentRoute: () => authRoute,
+} as any)
+
+const authAuthSignupRoute = authAuthSignupImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => authAuthRoute,
+} as any)
+
+const authAuthSigninRoute = authAuthSigninImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => authAuthRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -45,13 +77,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/_pathlessLayout': {
-      id: '/_pathlessLayout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof PathlessLayoutImport
-      parentRoute: typeof rootRoute
-    }
     '/redirect': {
       id: '/redirect'
       path: '/redirect'
@@ -59,49 +84,126 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RedirectImport
       parentRoute: typeof rootRoute
     }
+    '/(auth)': {
+      id: '/(auth)'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof authImport
+      parentRoute: typeof rootRoute
+    }
+    '/(auth)/_auth': {
+      id: '/(auth)/_auth'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof authAuthImport
+      parentRoute: typeof authRoute
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/(auth)/_auth/signin': {
+      id: '/(auth)/_auth/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof authAuthSigninImport
+      parentRoute: typeof authAuthImport
+    }
+    '/(auth)/_auth/signup': {
+      id: '/(auth)/_auth/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof authAuthSignupImport
+      parentRoute: typeof authAuthImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface authAuthRouteChildren {
+  authAuthSigninRoute: typeof authAuthSigninRoute
+  authAuthSignupRoute: typeof authAuthSignupRoute
+}
+
+const authAuthRouteChildren: authAuthRouteChildren = {
+  authAuthSigninRoute: authAuthSigninRoute,
+  authAuthSignupRoute: authAuthSignupRoute,
+}
+
+const authAuthRouteWithChildren = authAuthRoute._addFileChildren(
+  authAuthRouteChildren,
+)
+
+interface authRouteChildren {
+  authAuthRoute: typeof authAuthRouteWithChildren
+}
+
+const authRouteChildren: authRouteChildren = {
+  authAuthRoute: authAuthRouteWithChildren,
+}
+
+const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '': typeof PathlessLayoutRoute
+  '/': typeof authAuthRouteWithChildren
   '/redirect': typeof RedirectRoute
+  '/app': typeof AppIndexRoute
+  '/signin': typeof authAuthSigninRoute
+  '/signup': typeof authAuthSignupRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '': typeof PathlessLayoutRoute
+  '/': typeof authAuthRouteWithChildren
   '/redirect': typeof RedirectRoute
+  '/app': typeof AppIndexRoute
+  '/signin': typeof authAuthSigninRoute
+  '/signup': typeof authAuthSignupRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/_pathlessLayout': typeof PathlessLayoutRoute
   '/redirect': typeof RedirectRoute
+  '/(auth)': typeof authRouteWithChildren
+  '/(auth)/_auth': typeof authAuthRouteWithChildren
+  '/app/': typeof AppIndexRoute
+  '/(auth)/_auth/signin': typeof authAuthSigninRoute
+  '/(auth)/_auth/signup': typeof authAuthSignupRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/redirect'
+  fullPaths: '/' | '/redirect' | '/app' | '/signin' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/redirect'
-  id: '__root__' | '/' | '/_pathlessLayout' | '/redirect'
+  to: '/' | '/redirect' | '/app' | '/signin' | '/signup'
+  id:
+    | '__root__'
+    | '/'
+    | '/redirect'
+    | '/(auth)'
+    | '/(auth)/_auth'
+    | '/app/'
+    | '/(auth)/_auth/signin'
+    | '/(auth)/_auth/signup'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PathlessLayoutRoute: typeof PathlessLayoutRoute
   RedirectRoute: typeof RedirectRoute
+  authRoute: typeof authRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PathlessLayoutRoute: PathlessLayoutRoute,
   RedirectRoute: RedirectRoute,
+  authRoute: authRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -115,18 +217,41 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_pathlessLayout",
-        "/redirect"
+        "/redirect",
+        "/(auth)",
+        "/app/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/_pathlessLayout": {
-      "filePath": "_pathlessLayout.tsx"
-    },
     "/redirect": {
       "filePath": "redirect.tsx"
+    },
+    "/(auth)": {
+      "filePath": "(auth)",
+      "children": [
+        "/(auth)/_auth"
+      ]
+    },
+    "/(auth)/_auth": {
+      "filePath": "(auth)/_auth.tsx",
+      "parent": "/(auth)",
+      "children": [
+        "/(auth)/_auth/signin",
+        "/(auth)/_auth/signup"
+      ]
+    },
+    "/app/": {
+      "filePath": "app/index.tsx"
+    },
+    "/(auth)/_auth/signin": {
+      "filePath": "(auth)/_auth.signin.tsx",
+      "parent": "/(auth)/_auth"
+    },
+    "/(auth)/_auth/signup": {
+      "filePath": "(auth)/_auth.signup.tsx",
+      "parent": "/(auth)/_auth"
     }
   }
 }

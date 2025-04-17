@@ -1,6 +1,5 @@
 import {
   HeadContent,
-  Link,
   Outlet,
   Scripts,
   createRootRoute,
@@ -11,6 +10,7 @@ import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary';
 import { NotFound } from '~/components/NotFound';
 import appCss from '~/styles/app.css?url';
 import { seo } from '~/utils/seo';
+import { Theme } from '@radix-ui/themes';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -75,21 +75,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <div className="p-2 flex gap-2 text-lg">
-          <Link
-            to="/"
-            activeProps={{
-              className: 'font-bold',
-            }}
-            activeOptions={{ exact: true }}
-          >
-            Home
-          </Link>{' '}
-        </div>
-        <hr />
-        {children}
-        <TanStackRouterDevtools position="bottom-right" />
-        <Scripts />
+        <Theme
+          accentColor="tomato"
+          radius="large"
+          grayColor="slate"
+          panelBackground="solid"
+          appearance="dark"
+        >
+          <main className="flex min-h-screen flex-col">{children}</main>
+          <TanStackRouterDevtools position="bottom-right" />
+          <Scripts />
+        </Theme>
       </body>
     </html>
   );
