@@ -1,5 +1,6 @@
-import { defineConfig } from '@tanstack/react-start/config'
-import tsConfigPaths from 'vite-tsconfig-paths'
+import { defineConfig } from '@tanstack/react-start/config';
+import tsConfigPaths from 'vite-tsconfig-paths';
+import contentCollections from '@content-collections/vinxi';
 
 export default defineConfig({
   tsr: {
@@ -7,9 +8,10 @@ export default defineConfig({
   },
   vite: {
     plugins: [
+      contentCollections(),
       tsConfigPaths({
         projects: ['./tsconfig.json'],
       }),
     ],
   },
-})
+});

@@ -1,3 +1,5 @@
+import tailwindTypography from 'tailwind-typography';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
@@ -16,4 +18,5 @@ export default {
       mono: ['Menlo', 'Monaco', 'Courier New', 'monospace'],
     },
   },
+  plugins: [tailwindTypography],
 };

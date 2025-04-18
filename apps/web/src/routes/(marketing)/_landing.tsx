@@ -1,12 +1,7 @@
 import { Flex } from '@radix-ui/themes';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import { CTA } from '~/components/marketing/cta';
-import { FAQ } from '~/components/marketing/faq';
-import { Footer } from '~/components/marketing/footer';
 import { Header } from '~/components/marketing/header';
-import { Hero } from '~/components/marketing/hero';
-import { Pricing } from '~/components/marketing/pricing';
 
 export const getGithubStars = createServerFn({
   method: 'GET',
@@ -17,15 +12,15 @@ export const getGithubStars = createServerFn({
   return 2343;
 });
 
-export const Route = createFileRoute('/(marketing)/')({
-  component: Home,
+export const Route = createFileRoute('/(marketing)/_landing')({
+  component: RouteComponent,
   loader: async () => {
     const stars = await getGithubStars();
     return { stars };
   },
 });
 
-function Home() {
+function RouteComponent() {
   const state = Route.useLoaderData();
 
   return (
@@ -38,13 +33,7 @@ function Home() {
       <Header stars={state.stars} />
       <div className="custom-container space-y-12 pt-16 min-h-screen flex flex-col justify-between">
         <main className="flex-1">
-          <div className="max-w-3xl mx-auto py-0 sm:py-16">
-            <Hero />
-            <Pricing />
-            <CTA />
-            <FAQ />
-            <Footer />
-          </div>
+          <Outlet />
         </main>
       </div>
     </Flex>

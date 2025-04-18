@@ -15,13 +15,18 @@
     "@tanstack/react-router-devtools": "^1.116.0",
     "@tanstack/react-start": "^1.116.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "redaxios": "^0.5.1",
     "tailwind-merge": "^2.6.0",
+    "tailwind-typography": "^0.1.0",
     "vinxi": "0.5.3"
   },
   "devDependencies": {
+    "@content-collections/core": "^0.8.2",
+    "@content-collections/mdx": "^0.2.2",
+    "@content-collections/vinxi": "^0.1.0",
     "@types/node": "^22.14.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
