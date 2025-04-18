@@ -18,15 +18,17 @@ export function Header({ stars }: { stars: number }) {
       )}
     >
       <div className="grid md:grid-cols-5 grid-cols-2 w-full relative custom-container">
-        <Link to="/" className="flex items-center justify-center gap-2.5">
+        <Link to="/" className="flex items-center justify-start gap-2.5">
           <LogoBlack />
           <span className="text-base font-semibold text-neutral-900">
             Codecrawl
           </span>
         </Link>
         <div className="gap-8 col-span-3 hidden md:flex justify-center text-neutral-900 font-medium">
-          <Link to="/github">Playground</Link>
-          <a href="https://docs.codecrawl.com">Docs</a>
+          <Link to="/playground">Playground</Link>
+          <a href="https://docs.codecrawl.com" target="_blank">
+            Docs
+          </a>
           <Link to="/blog">Blog</Link>
           <Link to="/updates">Updates</Link>
         </div>

@@ -15,8 +15,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as RedirectImport } from './routes/redirect'
 import { Route as AppAppImport } from './routes/app/_app'
-import { Route as marketingUpdatesImport } from './routes/(marketing)/updates'
-import { Route as marketingGithubImport } from './routes/(marketing)/github'
 import { Route as marketingLandingImport } from './routes/(marketing)/_landing'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
 import { Route as AppAppIndexImport } from './routes/app/_app/index'
@@ -24,6 +22,8 @@ import { Route as marketingLandingIndexImport } from './routes/(marketing)/_land
 import { Route as AppAppPlaygroundImport } from './routes/app/_app/playground'
 import { Route as AppAppLogsImport } from './routes/app/_app/logs'
 import { Route as AppAppKeysImport } from './routes/app/_app/keys'
+import { Route as marketingLandingUpdatesImport } from './routes/(marketing)/_landing/updates'
+import { Route as marketingLandingPlaygroundImport } from './routes/(marketing)/_landing/playground'
 import { Route as authAuthSignupImport } from './routes/(auth)/_auth.signup'
 import { Route as authAuthSigninImport } from './routes/(auth)/_auth.signin'
 import { Route as marketingLandingBlogIndexImport } from './routes/(marketing)/_landing/blog.index'
@@ -65,18 +65,6 @@ const AppAppRoute = AppAppImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 
-const marketingUpdatesRoute = marketingUpdatesImport.update({
-  id: '/updates',
-  path: '/updates',
-  getParentRoute: () => marketingRoute,
-} as any)
-
-const marketingGithubRoute = marketingGithubImport.update({
-  id: '/github',
-  path: '/github',
-  getParentRoute: () => marketingRoute,
-} as any)
-
 const marketingLandingRoute = marketingLandingImport.update({
   id: '/_landing',
   getParentRoute: () => marketingRoute,
@@ -116,6 +104,20 @@ const AppAppKeysRoute = AppAppKeysImport.update({
   path: '/keys',
   getParentRoute: () => AppAppRoute,
 } as any)
+
+const marketingLandingUpdatesRoute = marketingLandingUpdatesImport.update({
+  id: '/updates',
+  path: '/updates',
+  getParentRoute: () => marketingLandingRoute,
+} as any)
+
+const marketingLandingPlaygroundRoute = marketingLandingPlaygroundImport.update(
+  {
+    id: '/playground',
+    path: '/playground',
+    getParentRoute: () => marketingLandingRoute,
+  } as any,
+)
 
 const authAuthSignupRoute = authAuthSignupImport.update({
   id: '/signup',
@@ -187,20 +189,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof marketingLandingImport
       parentRoute: typeof marketingRoute
     }
-    '/(marketing)/github': {
-      id: '/(marketing)/github'
-      path: '/github'
-      fullPath: '/github'
-      preLoaderRoute: typeof marketingGithubImport
-      parentRoute: typeof marketingImport
-    }
-    '/(marketing)/updates': {
-      id: '/(marketing)/updates'
-      path: '/updates'
-      fullPath: '/updates'
-      preLoaderRoute: typeof marketingUpdatesImport
-      parentRoute: typeof marketingImport
-    }
     '/app': {
       id: '/app'
       path: '/app'
@@ -228,6 +216,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/signup'
       preLoaderRoute: typeof authAuthSignupImport
       parentRoute: typeof authAuthImport
+    }
+    '/(marketing)/_landing/playground': {
+      id: '/(marketing)/_landing/playground'
+      path: '/playground'
+      fullPath: '/playground'
+      preLoaderRoute: typeof marketingLandingPlaygroundImport
+      parentRoute: typeof marketingLandingImport
+    }
+    '/(marketing)/_landing/updates': {
+      id: '/(marketing)/_landing/updates'
+      path: '/updates'
+      fullPath: '/updates'
+      preLoaderRoute: typeof marketingLandingUpdatesImport
+      parentRoute: typeof marketingLandingImport
     }
     '/app/_app/keys': {
       id: '/app/_app/keys'
@@ -315,6 +317,8 @@ const authRouteChildren: authRouteChildren = {
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
 
 interface marketingLandingRouteChildren {
+  marketingLandingPlaygroundRoute: typeof marketingLandingPlaygroundRoute
+  marketingLandingUpdatesRoute: typeof marketingLandingUpdatesRoute
   marketingLandingIndexRoute: typeof marketingLandingIndexRoute
   marketingLandingBlogSlugRoute: typeof marketingLandingBlogSlugRoute
   marketingLandingBlogIndexRoute: typeof marketingLandingBlogIndexRoute
@@ -322,6 +326,8 @@ interface marketingLandingRouteChildren {
 }
 
 const marketingLandingRouteChildren: marketingLandingRouteChildren = {
+  marketingLandingPlaygroundRoute: marketingLandingPlaygroundRoute,
+  marketingLandingUpdatesRoute: marketingLandingUpdatesRoute,
   marketingLandingIndexRoute: marketingLandingIndexRoute,
   marketingLandingBlogSlugRoute: marketingLandingBlogSlugRoute,
   marketingLandingBlogIndexRoute: marketingLandingBlogIndexRoute,
@@ -333,14 +339,10 @@ const marketingLandingRouteWithChildren =
 
 interface marketingRouteChildren {
   marketingLandingRoute: typeof marketingLandingRouteWithChildren
-  marketingGithubRoute: typeof marketingGithubRoute
-  marketingUpdatesRoute: typeof marketingUpdatesRoute
 }
 
 const marketingRouteChildren: marketingRouteChildren = {
   marketingLandingRoute: marketingLandingRouteWithChildren,
-  marketingGithubRoute: marketingGithubRoute,
-  marketingUpdatesRoute: marketingUpdatesRoute,
 }
 
 const marketingRouteWithChildren = marketingRoute._addFileChildren(
@@ -377,11 +379,11 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 export interface FileRoutesByFullPath {
   '/redirect': typeof RedirectRoute
   '/': typeof marketingLandingIndexRoute
-  '/github': typeof marketingGithubRoute
-  '/updates': typeof marketingUpdatesRoute
   '/app': typeof AppAppRouteWithChildren
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
+  '/playground': typeof marketingLandingPlaygroundRoute
+  '/updates': typeof marketingLandingUpdatesRoute
   '/app/keys': typeof AppAppKeysRoute
   '/app/logs': typeof AppAppLogsRoute
   '/app/playground': typeof AppAppPlaygroundRoute
@@ -394,11 +396,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/redirect': typeof RedirectRoute
   '/': typeof marketingLandingIndexRoute
-  '/github': typeof marketingGithubRoute
-  '/updates': typeof marketingUpdatesRoute
   '/app': typeof AppAppIndexRoute
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
+  '/playground': typeof marketingLandingPlaygroundRoute
+  '/updates': typeof marketingLandingUpdatesRoute
   '/app/keys': typeof AppAppKeysRoute
   '/app/logs': typeof AppAppLogsRoute
   '/app/playground': typeof AppAppPlaygroundRoute
@@ -414,12 +416,12 @@ export interface FileRoutesById {
   '/(auth)/_auth': typeof authAuthRouteWithChildren
   '/(marketing)': typeof marketingRouteWithChildren
   '/(marketing)/_landing': typeof marketingLandingRouteWithChildren
-  '/(marketing)/github': typeof marketingGithubRoute
-  '/(marketing)/updates': typeof marketingUpdatesRoute
   '/app': typeof AppRouteWithChildren
   '/app/_app': typeof AppAppRouteWithChildren
   '/(auth)/_auth/signin': typeof authAuthSigninRoute
   '/(auth)/_auth/signup': typeof authAuthSignupRoute
+  '/(marketing)/_landing/playground': typeof marketingLandingPlaygroundRoute
+  '/(marketing)/_landing/updates': typeof marketingLandingUpdatesRoute
   '/app/_app/keys': typeof AppAppKeysRoute
   '/app/_app/logs': typeof AppAppLogsRoute
   '/app/_app/playground': typeof AppAppPlaygroundRoute
@@ -435,11 +437,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/redirect'
     | '/'
-    | '/github'
-    | '/updates'
     | '/app'
     | '/signin'
     | '/signup'
+    | '/playground'
+    | '/updates'
     | '/app/keys'
     | '/app/logs'
     | '/app/playground'
@@ -451,11 +453,11 @@ export interface FileRouteTypes {
   to:
     | '/redirect'
     | '/'
-    | '/github'
-    | '/updates'
     | '/app'
     | '/signin'
     | '/signup'
+    | '/playground'
+    | '/updates'
     | '/app/keys'
     | '/app/logs'
     | '/app/playground'
@@ -469,12 +471,12 @@ export interface FileRouteTypes {
     | '/(auth)/_auth'
     | '/(marketing)'
     | '/(marketing)/_landing'
-    | '/(marketing)/github'
-    | '/(marketing)/updates'
     | '/app'
     | '/app/_app'
     | '/(auth)/_auth/signin'
     | '/(auth)/_auth/signup'
+    | '/(marketing)/_landing/playground'
+    | '/(marketing)/_landing/updates'
     | '/app/_app/keys'
     | '/app/_app/logs'
     | '/app/_app/playground'
@@ -536,28 +538,20 @@ export const routeTree = rootRoute
     "/(marketing)": {
       "filePath": "(marketing)",
       "children": [
-        "/(marketing)/_landing",
-        "/(marketing)/github",
-        "/(marketing)/updates"
+        "/(marketing)/_landing"
       ]
     },
     "/(marketing)/_landing": {
       "filePath": "(marketing)/_landing.tsx",
       "parent": "/(marketing)",
       "children": [
+        "/(marketing)/_landing/playground",
+        "/(marketing)/_landing/updates",
         "/(marketing)/_landing/",
         "/(marketing)/_landing/blog/$slug",
         "/(marketing)/_landing/blog/",
         "/(marketing)/_landing/blog/c/$category"
       ]
-    },
-    "/(marketing)/github": {
-      "filePath": "(marketing)/github.tsx",
-      "parent": "/(marketing)"
-    },
-    "/(marketing)/updates": {
-      "filePath": "(marketing)/updates.tsx",
-      "parent": "/(marketing)"
     },
     "/app": {
       "filePath": "app",
@@ -582,6 +576,14 @@ export const routeTree = rootRoute
     "/(auth)/_auth/signup": {
       "filePath": "(auth)/_auth.signup.tsx",
       "parent": "/(auth)/_auth"
+    },
+    "/(marketing)/_landing/playground": {
+      "filePath": "(marketing)/_landing/playground.tsx",
+      "parent": "/(marketing)/_landing"
+    },
+    "/(marketing)/_landing/updates": {
+      "filePath": "(marketing)/_landing/updates.tsx",
+      "parent": "/(marketing)/_landing"
     },
     "/app/_app/keys": {
       "filePath": "app/_app/keys.tsx",
