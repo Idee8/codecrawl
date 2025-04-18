@@ -1,4 +1,15 @@
-# 📒 Codecrawl
+<h3 align="center">
+  <a name="readme-top"></a>
+  <img
+    src="https://raw.githubusercontent.com/Idee8/codecrawl/refs/heads/main/assets/logo.svg"
+    height="200"
+    width="200"
+  >
+</h3>
+
+<div align="center">
+   <h1>Codecrawl</h1>
+</div>
 
 Empower your AI apps with clean data from any repository. Featuring advanced codebase file-trees, semantic search, llms.txt and data extraction capabilities.
 
