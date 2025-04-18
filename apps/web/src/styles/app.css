@@ -1,6 +1,13 @@
 @import "tailwindcss/base";
 @import "@radix-ui/themes/styles.css";
+@import url("https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.18.0/inter.css");
+
 
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .custom-container {
+    @apply md:max-w-6xl sm:max-w-4xl lg:max-w-5xl px-8 sm:px-14 lg:px-16 mx-auto w-full;
+  }
+}

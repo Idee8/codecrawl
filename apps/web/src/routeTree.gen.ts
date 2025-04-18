@@ -16,7 +16,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as RedirectImport } from './routes/redirect'
 import { Route as marketingIndexImport } from './routes/(marketing)/index'
 import { Route as AppAppImport } from './routes/app/_app'
+import { Route as marketingUpdatesImport } from './routes/(marketing)/updates'
 import { Route as marketingGithubImport } from './routes/(marketing)/github'
+import { Route as marketingBlogImport } from './routes/(marketing)/blog'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
 import { Route as AppAppIndexImport } from './routes/app/_app/index'
 import { Route as AppAppPlaygroundImport } from './routes/app/_app/playground'
@@ -60,9 +62,21 @@ const AppAppRoute = AppAppImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 
+const marketingUpdatesRoute = marketingUpdatesImport.update({
+  id: '/(marketing)/updates',
+  path: '/updates',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const marketingGithubRoute = marketingGithubImport.update({
   id: '/(marketing)/github',
   path: '/github',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const marketingBlogRoute = marketingBlogImport.update({
+  id: '/(marketing)/blog',
+  path: '/blog',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -132,11 +146,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuthImport
       parentRoute: typeof authRoute
     }
+    '/(marketing)/blog': {
+      id: '/(marketing)/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof marketingBlogImport
+      parentRoute: typeof rootRoute
+    }
     '/(marketing)/github': {
       id: '/(marketing)/github'
       path: '/github'
       fullPath: '/github'
       preLoaderRoute: typeof marketingGithubImport
+      parentRoute: typeof rootRoute
+    }
+    '/(marketing)/updates': {
+      id: '/(marketing)/updates'
+      path: '/updates'
+      fullPath: '/updates'
+      preLoaderRoute: typeof marketingUpdatesImport
       parentRoute: typeof rootRoute
     }
     '/app': {
@@ -261,7 +289,9 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 export interface FileRoutesByFullPath {
   '/redirect': typeof RedirectRoute
   '/': typeof marketingIndexRoute
+  '/blog': typeof marketingBlogRoute
   '/github': typeof marketingGithubRoute
+  '/updates': typeof marketingUpdatesRoute
   '/app': typeof AppAppRouteWithChildren
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
@@ -274,7 +304,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/redirect': typeof RedirectRoute
   '/': typeof marketingIndexRoute
+  '/blog': typeof marketingBlogRoute
   '/github': typeof marketingGithubRoute
+  '/updates': typeof marketingUpdatesRoute
   '/app': typeof AppAppIndexRoute
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
@@ -288,7 +320,9 @@ export interface FileRoutesById {
   '/redirect': typeof RedirectRoute
   '/(auth)': typeof authRouteWithChildren
   '/(auth)/_auth': typeof authAuthRouteWithChildren
+  '/(marketing)/blog': typeof marketingBlogRoute
   '/(marketing)/github': typeof marketingGithubRoute
+  '/(marketing)/updates': typeof marketingUpdatesRoute
   '/app': typeof AppRouteWithChildren
   '/app/_app': typeof AppAppRouteWithChildren
   '/(marketing)/': typeof marketingIndexRoute
@@ -305,7 +339,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/redirect'
     | '/'
+    | '/blog'
     | '/github'
+    | '/updates'
     | '/app'
     | '/signin'
     | '/signup'
@@ -317,7 +353,9 @@ export interface FileRouteTypes {
   to:
     | '/redirect'
     | '/'
+    | '/blog'
     | '/github'
+    | '/updates'
     | '/app'
     | '/signin'
     | '/signup'
@@ -329,7 +367,9 @@ export interface FileRouteTypes {
     | '/redirect'
     | '/(auth)'
     | '/(auth)/_auth'
+    | '/(marketing)/blog'
     | '/(marketing)/github'
+    | '/(marketing)/updates'
     | '/app'
     | '/app/_app'
     | '/(marketing)/'
@@ -345,7 +385,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   RedirectRoute: typeof RedirectRoute
   authRoute: typeof authRouteWithChildren
+  marketingBlogRoute: typeof marketingBlogRoute
   marketingGithubRoute: typeof marketingGithubRoute
+  marketingUpdatesRoute: typeof marketingUpdatesRoute
   AppRoute: typeof AppRouteWithChildren
   marketingIndexRoute: typeof marketingIndexRoute
 }
@@ -353,7 +395,9 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   RedirectRoute: RedirectRoute,
   authRoute: authRouteWithChildren,
+  marketingBlogRoute: marketingBlogRoute,
   marketingGithubRoute: marketingGithubRoute,
+  marketingUpdatesRoute: marketingUpdatesRoute,
   AppRoute: AppRouteWithChildren,
   marketingIndexRoute: marketingIndexRoute,
 }
@@ -370,7 +414,9 @@ export const routeTree = rootRoute
       "children": [
         "/redirect",
         "/(auth)",
+        "/(marketing)/blog",
         "/(marketing)/github",
+        "/(marketing)/updates",
         "/app",
         "/(marketing)/"
       ]
@@ -392,8 +438,14 @@ export const routeTree = rootRoute
         "/(auth)/_auth/signup"
       ]
     },
+    "/(marketing)/blog": {
+      "filePath": "(marketing)/blog.tsx"
+    },
     "/(marketing)/github": {
       "filePath": "(marketing)/github.tsx"
+    },
+    "/(marketing)/updates": {
+      "filePath": "(marketing)/updates.tsx"
     },
     "/app": {
       "filePath": "app",
