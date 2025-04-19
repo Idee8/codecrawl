@@ -3,8 +3,8 @@ import { RssIcon } from '@heroicons/react/24/outline';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { allUpdates } from 'content-collections';
 import { format } from 'date-fns';
-import { GithubLogo } from '~/components/github-logo';
 import { ButtonLink } from '~/components/ui/button-link';
+import { SvgGithubLogo } from '~/components/svgs';
 
 export const Route = createFileRoute('/(marketing)/_landing/updates/')({
   component: RouteComponent,
@@ -23,7 +23,7 @@ function RouteComponent() {
       </div>
       <div className="flex w-fit items-center gap-2 space-x-2">
         <ButtonLink href="https://github.com/Idee8/codecrawl" target="_blank">
-          <GithubLogo className="w-4 h-4" />
+          <SvgGithubLogo className="w-4 h-4" />
         </ButtonLink>
         <ButtonLink href="/updates">
           <RssIcon className="w-4 h-4" />
@@ -67,7 +67,7 @@ function RouteComponent() {
                   className="group mx-5 flex items-center space-x-3 md:mx-0"
                 >
                   <time
-                    dateTime=""
+                    dateTime={update.date}
                     className="text-sm text-neutral-500 transition-all group-hover:text-neutral-800 md:hidden"
                   >
                     {format(update.date, 'MMMM d, yyyy')}
