@@ -1,10 +1,9 @@
 import { Button } from '@radix-ui/themes';
-import { LogoBlack } from '../logo';
-import { Link } from '@tanstack/react-router';
+import { SvgLogoBlack, SvgGithubLogo } from '../svgs';
 import { useScroll } from '~/hooks/use-scroll';
 import { cn } from '~/utils/classnames';
-import { GithubLogo } from '../github-logo';
 import { kFormatter } from '~/utils/k-formatter';
+import { Link } from '@tanstack/react-router';
 
 export function Header({ stars }: { stars: number }) {
   const scrolled = useScroll(10);
@@ -19,7 +18,7 @@ export function Header({ stars }: { stars: number }) {
     >
       <div className="grid md:grid-cols-5 grid-cols-2 w-full relative custom-container">
         <Link to="/" className="flex items-center justify-start gap-2.5">
-          <LogoBlack />
+          <SvgLogoBlack />
           <span className="text-base font-semibold text-neutral-900">
             Codecrawl
           </span>
@@ -39,7 +38,7 @@ export function Header({ stars }: { stars: number }) {
             rel="noopener noreferrer"
             className="text-neutral-900 flex items-center gap-3"
           >
-            <GithubLogo className="w-4 h-4" />
+            <SvgGithubLogo className="w-4 h-4" />
             {kFormatter(stars)}
           </a>
           <Button>Sign In</Button>

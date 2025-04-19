@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react';
 
-export function GithubLogo(props: SVGProps<SVGSVGElement>) {
+export default function GithubLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       role="img"

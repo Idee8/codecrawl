@@ -1,5 +1,5 @@
 import { ArrowRightCircleIcon, HeartIcon } from '@heroicons/react/24/solid';
-import { LogoBlack } from '../logo';
+import { SvgLogoBlack } from '../svgs';
 import { Button } from '@radix-ui/themes';
 import { useNavigate } from '@tanstack/react-router';
 
@@ -11,7 +11,7 @@ export function CTA() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="relative max-w-3xl mx-auto text-center">
           <div className="inline-flex scale-150 items-center justify-center rounded-xl mb-6 relative">
-            <LogoBlack className="h-10 w-10" />
+            <SvgLogoBlack className="h-10 w-10" />
             <HeartIcon className="absolute bottom-0 right-0 h-4 w-4 text-[var(--accent-9)] animate-wiggle" />
           </div>
           <h3 className="text-neutral-800 font-medium text-center text-[2rem] @lg:text-[3rem] tracking-tight leading-[1.08]">

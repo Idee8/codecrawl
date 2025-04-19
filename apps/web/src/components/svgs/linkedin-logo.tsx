@@ -1,7 +1,7 @@
 import type { SVGProps } from 'react';
 import { cn } from '~/utils/classnames';
 
-export function LinkedInLogo(props: SVGProps<SVGSVGElement>) {
+export default function SvgLinkedInLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

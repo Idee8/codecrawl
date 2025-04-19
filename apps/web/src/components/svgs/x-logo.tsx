@@ -1,7 +1,7 @@
 import type { SVGProps } from 'react';
 import { cn } from '~/utils/classnames';
 
-export function XLogo(props: SVGProps<SVGSVGElement>) {
+export default function XLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="300"

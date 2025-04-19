@@ -1,9 +1,11 @@
 import { Link } from '@tanstack/react-router';
 
-import { LogoBlack } from '../logo';
-import { GithubLogo } from '../github-logo';
-import { LinkedInLogo } from '../linkedin-logo';
-import { XLogo } from '../x-logo';
+import {
+  SvgLogoBlack,
+  SvgGithubLogo,
+  SvgXLogo,
+  SvgLinkedInLogo,
+} from '../svgs';
 
 export function Footer() {
   return (
@@ -12,7 +14,7 @@ export function Footer() {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="flex flex-col gap-6">
             <div className="grow">
-              <LogoBlack className="w-10 h-10" />
+              <SvgLogoBlack className="w-10 h-10" />
             </div>
             <div className="flex items-center gap-3">
               <a
@@ -20,21 +22,21 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <GithubLogo className="w-5 h-5" />
+                <SvgGithubLogo className="w-5 h-5" />
               </a>
               <a
                 href="https://www.linkedin.com/company/codecrawl"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <LinkedInLogo className="w-5 h-5" />
+                <SvgLinkedInLogo className="w-5 h-5" />
               </a>
               <a
                 href="https://x.com/codecrawl"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <XLogo className="w-5 h-5" />
+                <SvgXLogo className="w-5 h-5" />
               </a>
             </div>
           </div>
