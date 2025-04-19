@@ -14,6 +14,7 @@ function Home() {
       <Hero />
       <Pricing />
       <CTA />
+      <hr className="border-t border-neutral-100 my-20" />
       <FAQ />
     </div>
   );
