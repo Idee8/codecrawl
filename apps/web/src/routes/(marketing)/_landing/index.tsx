@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { CTA } from '~/components/marketing/cta';
 import { FAQ } from '~/components/marketing/faq';
-import { Footer } from '~/components/marketing/footer';
 import { Hero } from '~/components/marketing/hero';
 import { Pricing } from '~/components/marketing/pricing';
 
@@ -16,7 +15,6 @@ function Home() {
       <Pricing />
       <CTA />
       <FAQ />
-      <Footer />
     </div>
   );
 }

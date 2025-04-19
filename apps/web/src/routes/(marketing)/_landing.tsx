@@ -1,6 +1,7 @@
 import { Flex } from '@radix-ui/themes';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
+import { Footer } from '~/components/marketing/footer';
 import { Header } from '~/components/marketing/header';
 
 export const getGithubStars = createServerFn({
@@ -35,6 +36,7 @@ function RouteComponent() {
         <main className="flex-1">
           <Outlet />
         </main>
+        <Footer />
       </div>
     </Flex>
   );
