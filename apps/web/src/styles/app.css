@@ -1,13 +1,17 @@
-@import "tailwindcss/base";
-@import "@radix-ui/themes/styles.css";
-@import url("https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.18.0/inter.css");
+@import 'tailwindcss';
+@import '@radix-ui/themes/styles.css' layer(base);
+@import url('https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.18.0/inter.css')
+layer(base);
+
+@plugin "@tailwindcss/typography";
+
+@utility custom-container {
+  @apply md:max-w-6xl sm:max-w-4xl lg:max-w-5xl px-8 sm:px-14 lg:px-16 mx-auto w-full;
+}
 
 
-@tailwind components;
-@tailwind utilities;
-
-@layer utilities {
-  .custom-container {
-    @apply md:max-w-6xl sm:max-w-4xl lg:max-w-5xl px-8 sm:px-14 lg:px-16 mx-auto w-full;
-  }
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
