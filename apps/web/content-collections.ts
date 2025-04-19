@@ -22,6 +22,25 @@ const posts = defineCollection({
   },
 });
 
+const updates = defineCollection({
+  name: 'updates',
+  directory: 'content/updates',
+  include: '**/*.mdx',
+  schema: (z) => ({
+    title: z.string(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    authors: z.array(z.string()),
+    image: z.string(),
+  }),
+  transform: async (post, ctx) => {
+    const content = await compileMDX(ctx, post);
+    return {
+      ...post,
+      content,
+    };
+  },
+});
+
 export default defineConfig({
-  collections: [posts],
+  collections: [posts, updates],
 });
