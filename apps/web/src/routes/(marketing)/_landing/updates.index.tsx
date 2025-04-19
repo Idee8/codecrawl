@@ -21,7 +21,7 @@ function RouteComponent() {
           All the latest updates, improvements, and fixes to Codecrawl
         </p>
       </div>
-      <div className="flex w-fit items-center space-x-2">
+      <div className="flex w-fit items-center gap-2 space-x-2">
         <ButtonLink href="https://github.com/Idee8/codecrawl" target="_blank">
           <GithubLogo className="w-4 h-4" />
         </ButtonLink>

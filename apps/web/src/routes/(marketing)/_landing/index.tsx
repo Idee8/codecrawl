@@ -13,6 +13,7 @@ function Home() {
     <div className="max-w-3xl mx-auto py-0 sm:py-16">
       <Hero />
       <Pricing />
+      <hr className="border-t border-neutral-100 my-20" />
       <CTA />
       <hr className="border-t border-neutral-100 my-20" />
       <FAQ />
