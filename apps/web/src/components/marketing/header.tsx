@@ -1,4 +1,3 @@
-import { Button } from '@radix-ui/themes';
 import { SvgLogoBlack, SvgGithubLogo } from '../svgs';
 import { useScroll } from '~/hooks/use-scroll';
 import { cn } from '~/utils/classnames';
@@ -23,7 +22,7 @@ export function Header({ stars }: { stars: number }) {
             Codecrawl
           </span>
         </Link>
-        <div className="gap-8 col-span-3 hidden md:flex justify-center text-neutral-900 font-medium">
+        <div className="gap-8 col-span-3 hidden md:flex justify-center items-center text-neutral-900 font-medium">
           <Link to="/playground">Playground</Link>
           <a href="https://docs.codecrawl.com" target="_blank">
             Docs
@@ -31,7 +30,7 @@ export function Header({ stars }: { stars: number }) {
           <Link to="/blog">Blog</Link>
           <Link to="/updates">Updates</Link>
         </div>
-        <div className="flex gap-4 justify-end relative items-center">
+        <div className="flex gap-8 justify-end relative items-center">
           <a
             href={'https://github.com/Idee8/codecrawl'}
             target="_blank"
@@ -41,7 +40,14 @@ export function Header({ stars }: { stars: number }) {
             <SvgGithubLogo className="w-4 h-4" />
             {kFormatter(stars)}
           </a>
-          <Button>Sign In</Button>
+          <Link
+            to="/signin"
+            className={cn(
+              'h-9 rounded-[10px] text-sm font-medium flex items-center transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 bg-[#fff] text-[#36322F] hover:bg-[#f0f0f0] disabled:bg-[#f5f5f5] disabled:text-[#8c8885] disabled:hover:bg-[#f5f5f5] [box-shadow:0_0_0_1px_hsl(35deg_22%_90%),_0_1px_2px_hsl(32,_10%,_68%),_0_3px_3px_hsl(32,11%,82%),_0_-2px_hsl(58,4%,93%)_inset] hover:translate-y-[1px] hover:scale-[0.98] hover:[box-shadow:0_0_0_1px_hsl(35deg_22%_90%),_0_1px_2px_hsl(32,_10%,_68%)] active:translate-y-[2px] active:scale-[0.97] active:[box-shadow:0_0_0_1px_hsl(35deg_22%_90%),_inset_0_1px_1px_hsl(32,_10%,_68%)] disabled:shadow-none disabled:hover:translate-y-0 disabled:hover:scale-100 px-2.5 py-1',
+            )}
+          >
+            Sign In
+          </Link>
         </div>
       </div>
     </header>

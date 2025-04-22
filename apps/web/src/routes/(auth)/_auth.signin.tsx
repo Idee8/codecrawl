@@ -9,7 +9,7 @@ import {
 } from '@radix-ui/themes';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
-import { Logo } from '~/components/logo';
+import { SvgLogo } from '~/components/svgs';
 
 export const Route = createFileRoute('/(auth)/_auth/signin')({
   component: RouteComponent,
@@ -21,7 +21,7 @@ function RouteComponent() {
       <Card size="1" className="p-4" variant="classic">
         <Flex direction="column" gap="5" p={'4'}>
           <Flex direction="column" gap="2">
-            <Avatar fallback={<Logo />} color="gray" mb={'4'} />
+            <Avatar fallback={<SvgLogo />} color="gray" mb={'4'} />
             <Text size={'5'} weight={'medium'}>
               Sign in to your account
             </Text>
