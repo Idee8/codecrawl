@@ -74,7 +74,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning className="font-sans antialiased">
         <Theme
           accentColor="tomato"
           radius="large"

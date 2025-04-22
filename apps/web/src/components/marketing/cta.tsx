@@ -25,7 +25,6 @@ export function CTA() {
             <Button
               variant="solid"
               size="3"
-              radius="full"
               className="cursor-pointer"
               onClick={() => navigate({ to: '/signup' })}
             >
