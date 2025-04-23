@@ -13,8 +13,8 @@ import { users } from '../db/schema';
 export const authMiddleware: (st?: boolean) => RequestHandler =
   (shouldThrow = true) =>
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    const accessToken = req.headers['access-token'] as string;
-    const refreshToken = req.headers['refresh-token'] as string;
+    const accessToken = req.headers['x-access-token'] as string;
+    const refreshToken = req.headers['x-refresh-token'] as string;
 
     if (!accessToken || !refreshToken) {
       if (shouldThrow) {

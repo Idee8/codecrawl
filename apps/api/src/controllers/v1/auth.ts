@@ -1,42 +1,48 @@
 import { eq } from 'drizzle-orm';
 import argon2 from 'argon2';
 import type { Request, Response } from 'express';
-
+import { z } from 'zod';
 import { db } from '../../db';
 import { apiKeys, teams, users } from '../../db/schema';
 import { createTokens } from '../../services/jwt-service';
 import { createApiKey } from '../../services/api-keys-service';
 
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = loginSchema.parse(req.body);
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    const isPasswordValid = await argon2.verify(
+      user.hashedPassword as string,
+      password,
+    );
+
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: 'Invalid password' });
+    }
+
+    const tokens = createTokens(user);
+
+    return res.status(200).json({
+      success: true,
+      tokens,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ error: 'Invalid request' });
   }
-
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
-
-  if (!user) {
-    return res.status(400).json({ error: 'User not found' });
-  }
-
-  const isPasswordValid = await argon2.verify(
-    user.hashedPassword as string,
-    password,
-  );
-
-  if (!isPasswordValid) {
-    return res.status(400).json({ error: 'Invalid password' });
-  }
-
-  const tokens = createTokens(user);
-
-  return res.status(200).json({
-    success: true,
-    tokens,
-  });
 };
 
 export const register = async (req: Request, res: Response) => {

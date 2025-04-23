@@ -1,11 +1,10 @@
 import { KeyIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
 import { Avatar, DropdownMenu, Flex, Text } from '@radix-ui/themes';
 import { Link } from '@tanstack/react-router';
-import { useState } from 'react';
-import { LogoutConfirm } from './logout-confirm';
+import { useAuthContext } from '~/contexts/auth-context';
 
 export function Sidebar() {
-  const [open, setOpen] = useState(false);
+  const { user } = useAuthContext();
 
   return (
     <Flex
@@ -68,9 +67,9 @@ export function Sidebar() {
               <Flex gap={'4'} align={'center'}>
                 <Avatar fallback="I" variant="soft" radius="full" />
                 <Flex direction={'column'}>
-                  <Text>Irere Emmanuel</Text>
+                  <Text>Account</Text>
                   <Text size={'1'} color="gray">
-                    irere2050@gmail.com
+                    {user?.email}
                   </Text>
                 </Flex>
               </Flex>
@@ -79,15 +78,10 @@ export function Sidebar() {
               <DropdownMenu.Item>Profile</DropdownMenu.Item>
               <DropdownMenu.Item>Appearance</DropdownMenu.Item>
               <DropdownMenu.Separator />
-              <LogoutConfirm
-                trigger={
-                  <DropdownMenu.Item color="red" onClick={() => setOpen(!open)}>
-                    Logout
-                  </DropdownMenu.Item>
-                }
-                open={open}
-                setOpen={setOpen}
-              />
+
+              <DropdownMenu.Item color="red" asChild>
+                <Link to={'/logout'}>Logout</Link>
+              </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </Flex>

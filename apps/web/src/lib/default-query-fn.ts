@@ -1,8 +1,7 @@
 import { API_BASE_URL } from '~/lib/constants';
-
 import { useTokenStore } from '~/store/use-token-store';
 
-export const defaultQueryFn = async ({ queryKey }: { queryKey: string }) => {
+export const defaultQueryFn = async ({ queryKey }: { queryKey: any }) => {
   const { accessToken, refreshToken } = useTokenStore.getState();
 
   const resp = await fetch(`${API_BASE_URL}/${queryKey}`, {

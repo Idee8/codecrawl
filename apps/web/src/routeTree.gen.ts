@@ -16,6 +16,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as RedirectImport } from './routes/redirect'
 import { Route as AppAppImport } from './routes/app/_app'
 import { Route as marketingLandingImport } from './routes/(marketing)/_landing'
+import { Route as authLogoutImport } from './routes/(auth)/logout'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
 import { Route as AppAppIndexImport } from './routes/app/_app/index'
 import { Route as marketingLandingIndexImport } from './routes/(marketing)/_landing/index'
@@ -69,6 +70,12 @@ const AppAppRoute = AppAppImport.update({
 const marketingLandingRoute = marketingLandingImport.update({
   id: '/_landing',
   getParentRoute: () => marketingRoute,
+} as any)
+
+const authLogoutRoute = authLogoutImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => authRoute,
 } as any)
 
 const authAuthRoute = authAuthImport.update({
@@ -183,6 +190,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof authAuthImport
       parentRoute: typeof authRoute
+    }
+    '/(auth)/logout': {
+      id: '/(auth)/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof authLogoutImport
+      parentRoute: typeof authImport
     }
     '/(marketing)': {
       id: '/(marketing)'
@@ -324,10 +338,12 @@ const authAuthRouteWithChildren = authAuthRoute._addFileChildren(
 
 interface authRouteChildren {
   authAuthRoute: typeof authAuthRouteWithChildren
+  authLogoutRoute: typeof authLogoutRoute
 }
 
 const authRouteChildren: authRouteChildren = {
   authAuthRoute: authAuthRouteWithChildren,
+  authLogoutRoute: authLogoutRoute,
 }
 
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
@@ -397,6 +413,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 export interface FileRoutesByFullPath {
   '/redirect': typeof RedirectRoute
   '/': typeof marketingLandingIndexRoute
+  '/logout': typeof authLogoutRoute
   '/app': typeof AppAppRouteWithChildren
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
@@ -415,6 +432,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/redirect': typeof RedirectRoute
   '/': typeof marketingLandingIndexRoute
+  '/logout': typeof authLogoutRoute
   '/app': typeof AppAppIndexRoute
   '/signin': typeof authAuthSigninRoute
   '/signup': typeof authAuthSignupRoute
@@ -434,6 +452,7 @@ export interface FileRoutesById {
   '/redirect': typeof RedirectRoute
   '/(auth)': typeof authRouteWithChildren
   '/(auth)/_auth': typeof authAuthRouteWithChildren
+  '/(auth)/logout': typeof authLogoutRoute
   '/(marketing)': typeof marketingRouteWithChildren
   '/(marketing)/_landing': typeof marketingLandingRouteWithChildren
   '/app': typeof AppRouteWithChildren
@@ -458,6 +477,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/redirect'
     | '/'
+    | '/logout'
     | '/app'
     | '/signin'
     | '/signup'
@@ -475,6 +495,7 @@ export interface FileRouteTypes {
   to:
     | '/redirect'
     | '/'
+    | '/logout'
     | '/app'
     | '/signin'
     | '/signup'
@@ -492,6 +513,7 @@ export interface FileRouteTypes {
     | '/redirect'
     | '/(auth)'
     | '/(auth)/_auth'
+    | '/(auth)/logout'
     | '/(marketing)'
     | '/(marketing)/_landing'
     | '/app'
@@ -548,7 +570,8 @@ export const routeTree = rootRoute
     "/(auth)": {
       "filePath": "(auth)",
       "children": [
-        "/(auth)/_auth"
+        "/(auth)/_auth",
+        "/(auth)/logout"
       ]
     },
     "/(auth)/_auth": {
@@ -558,6 +581,10 @@ export const routeTree = rootRoute
         "/(auth)/_auth/signin",
         "/(auth)/_auth/signup"
       ]
+    },
+    "/(auth)/logout": {
+      "filePath": "(auth)/logout.tsx",
+      "parent": "/(auth)"
     },
     "/(marketing)": {
       "filePath": "(marketing)",
