@@ -17,7 +17,7 @@ export const Route = createFileRoute('/(auth)/_auth/signin')({
 
 function RouteComponent() {
   return (
-    <Box className="max-w-md">
+    <Box className="max-w-lg">
       <Card size="1" className="p-4" variant="classic">
         <Flex direction="column" gap="5" p={'4'}>
           <Flex direction="column" gap="2">

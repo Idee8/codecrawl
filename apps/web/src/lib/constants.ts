@@ -15,3 +15,6 @@ export const BLOG_CATEGORIES = [
     gradient: 'from-purple-50 to-purple-100',
   },
 ];
+
+export const API_BASE_URL = 'http://localhost:4000/v1';
+export const isServer = typeof window === 'undefined';
