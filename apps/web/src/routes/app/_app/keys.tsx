@@ -1,10 +1,10 @@
-import { PlusIcon } from '@heroicons/react/24/outline';
-import { Button, Flex, Text } from '@radix-ui/themes';
+import { Flex, Text } from '@radix-ui/themes';
 import { createFileRoute } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { seo } from '~/utils/seo';
 import { KeysTable } from '~/components/keys-table';
+import { CreateKeyModal } from '~/components/create-key-modal';
 
 export const Route = createFileRoute('/app/_app/keys')({
   component: RouteComponent,
@@ -38,9 +38,7 @@ function RouteComponent() {
             Create an API key to use Codecrawl in your applications.
           </Text>
         </Flex>
-        <Button>
-          <PlusIcon className="w-4 h-4" /> Create Key
-        </Button>
+        <CreateKeyModal />
       </Flex>
       <KeysTable />
     </Flex>

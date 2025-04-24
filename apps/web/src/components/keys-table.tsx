@@ -16,9 +16,11 @@ export function KeysTable() {
   const handleCopy = (text: string) => () => {
     copy(text)
       .then(() => {
+        console.log('Copied to clipboard', copiedText);
         toast.success('Copied to clipboard');
       })
       .catch((error) => {
+        console.log(error);
         toast.error('Failed to copy');
       });
   };
