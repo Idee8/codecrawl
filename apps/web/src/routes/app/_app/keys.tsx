@@ -1,7 +1,10 @@
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { Button, Flex, Table, Text } from '@radix-ui/themes';
+import { PlusIcon } from '@heroicons/react/24/outline';
+import { Button, Flex, Text } from '@radix-ui/themes';
 import { createFileRoute } from '@tanstack/react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
+
 import { seo } from '~/utils/seo';
+import { KeysTable } from '~/components/keys-table';
 
 export const Route = createFileRoute('/app/_app/keys')({
   component: RouteComponent,
@@ -10,9 +13,20 @@ export const Route = createFileRoute('/app/_app/keys')({
       meta: [...seo({ title: 'API Keys | Codecrawl' })],
     };
   },
+  loader: async ({ context }) => {
+    await context.queryClient.prefetchQuery({
+      queryKey: ['keys'],
+    });
+  },
 });
 
 function RouteComponent() {
+  const { data } = useSuspenseQuery<{
+    keys: { id: string; name: string; key: string; createdAt: string }[];
+  }>({
+    queryKey: ['users/keys'],
+  });
+
   return (
     <Flex direction={'column'} gap={'4'}>
       <Flex justify={'between'} align={'center'}>
@@ -28,38 +42,7 @@ function RouteComponent() {
           <PlusIcon className="w-4 h-4" /> Create Key
         </Button>
       </Flex>
-
-      <Table.Root variant={'surface'}>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>API Key</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Created</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
-          </Table.Row>
-        </Table.Header>
-
-        <Table.Body>
-          <Table.Row>
-            <Table.RowHeaderCell>Default</Table.RowHeaderCell>
-            <Table.Cell>
-              <Text size={'2'} color={'gray'} weight={'medium'}>
-                **********
-              </Text>
-            </Table.Cell>
-            <Table.Cell>
-              <Text size={'2'} color={'gray'} weight={'medium'}>
-                Mon, 17 Apr 2025
-              </Text>
-            </Table.Cell>
-            <Table.Cell>
-              <Button variant={'ghost'}>
-                <TrashIcon className="w-4 h-4" />
-              </Button>
-            </Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table.Root>
+      <KeysTable />
     </Flex>
   );
 }
