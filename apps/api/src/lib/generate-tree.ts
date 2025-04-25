@@ -1,4 +1,4 @@
-import { redisConnection } from '../services/queue-service';
+import { redisConnection } from '~/services/queue-service';
 
 export interface TreeGenerationData {
   id: string;

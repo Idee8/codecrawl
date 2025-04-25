@@ -6,9 +6,9 @@ import {
   createTokens,
   type AccessTokenPayload,
   type RefreshTokenPayload,
-} from '../services/jwt-service';
-import { db } from '../db';
-import { users } from '../db/schema';
+} from '~/services/jwt-service';
+import { db } from '~/db';
+import { users } from '~/db/schema';
 
 export const authMiddleware: (st?: boolean) => RequestHandler =
   (shouldThrow = true) =>

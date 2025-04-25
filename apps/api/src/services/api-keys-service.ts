@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import { eq, desc } from 'drizzle-orm';
 
-import { db } from '../db';
-import { type ApiKey, apiKeys } from '../db/schema';
+import { db } from '~/db';
+import { type ApiKey, apiKeys } from '~/db/schema';
 
 const API_KEY_BYTE_LENGTH = 32;
 

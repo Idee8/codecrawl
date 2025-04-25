@@ -1,5 +1,5 @@
-import type { ConfigMerged } from '../../../config/configSchema';
-import { logger } from '../../../lib/logger';
+import type { ConfigMerged } from '~/config/configSchema';
+import { logger } from '~/lib/logger';
 import { parseFile } from '../../treeSitter/parseFile';
 import { getFileManipulator } from '../fileManipulate';
 import type { RawFile } from '../fileTypes';

@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
 
-import { validateApiKey } from '../services/api-keys-service';
-import { redisRateLimitClient, getRateLimiter } from '../services/rate-limiter';
-import type { RateLimiterMode } from '../types';
-import { logger } from '../lib/logger';
+import { validateApiKey } from '~/services/api-keys-service';
+import { redisRateLimitClient, getRateLimiter } from '~/services/rate-limiter';
+import type { RateLimiterMode } from '~/types';
+import { logger } from '~/lib/logger';
 
 const API_KEY_CACHE_PREFIX = 'apiKeyCache:';
 const API_KEY_CACHE_TTL_SECONDS = 300;

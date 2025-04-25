@@ -4,7 +4,7 @@ import iconv from 'iconv-lite';
 import jschartdet from 'jschardet';
 import { isBinary } from 'istextorbinary';
 
-import { logger } from '../../../lib/logger';
+import { logger } from '~/lib/logger';
 
 // Maximum file size to process (50MB)
 // This provents out-of-memory errors when processing very large files

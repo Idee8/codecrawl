@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Request, Response } from 'express';
-import { saveGeneratedLlmsTxt } from '../../lib/generate-llms-txt/redis';
-import { getGenerateLlmsTxtQueue } from '../../services/queue-service';
+import { saveGeneratedLlmsTxt } from '~/lib/generate-llms-txt/redis';
+import { getGenerateLlmsTxtQueue } from '~/services/queue-service';
 
 export type GenerateLLMsTextResponse = {
   success: boolean;

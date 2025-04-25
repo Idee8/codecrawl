@@ -3,7 +3,7 @@ import { Mutex } from 'async-mutex';
 import * as fs from 'node:fs';
 import os from 'node:os';
 
-import { logger } from '../lib/logger';
+import { logger } from '~/lib/logger';
 
 const IS_KUBERNETES = process.env.IS_KUBERNETES === 'true';
 

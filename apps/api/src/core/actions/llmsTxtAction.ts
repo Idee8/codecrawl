@@ -4,10 +4,10 @@ import {
   type ConfigBase,
   type ConfigMerged,
   type OutputStyle,
-} from '../../config/configSchema';
-import { logger } from '../../lib/logger';
-import type { CrawlOptions } from '../../types';
-import { rethrowValidationErrorIfZodError } from '../../utils/errorHandle';
+} from '~/config/configSchema';
+import { logger } from '~/lib/logger';
+import type { CrawlOptions } from '~/types';
+import { rethrowValidationErrorIfZodError } from '~/utils/errorHandle';
 import { generateOutput } from '../output/outputGenerate';
 import { collectFiles } from '../file/fileCollect';
 import { processFiles } from '../file/fileProcess';

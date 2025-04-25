@@ -1,6 +1,6 @@
 import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
-import { logger } from '../lib/logger';
+import { logger } from '~/lib/logger';
 
 export type QueueFunction = () => Queue<any, any, string, any, any, string>;
 

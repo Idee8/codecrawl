@@ -1,16 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { logger } from '../lib/logger';
+import { logger } from '~/lib/logger';
 import {
   cleanOldConcurrencyLimitEntries,
   getConcurrencyQueueJobsCount,
   getConcurrencyLimitActiveJobs,
   pushConcurrencyLimitActiveJob,
   pushConcurrencyLimitedJob,
-} from '../lib/concurrency-limit';
+} from '~/lib/concurrency-limit';
 import { getCrawlQueue } from './queue-service';
 import { getConcurrencyLimitMax } from './rate-limiter';
-import type { CrawlOptions, PlanType } from '../types';
+import type { CrawlOptions, PlanType } from '~/types';
 
 async function _addCrawlJobToConcurrencyQueue(
   codeCrawlOptions: any,

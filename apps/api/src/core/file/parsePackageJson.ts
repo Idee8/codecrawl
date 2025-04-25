@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { logger } from '../../lib/logger';
+import { logger } from '~/lib/logger';
 
 export const getVersion = async (): Promise<string> => {
   try {

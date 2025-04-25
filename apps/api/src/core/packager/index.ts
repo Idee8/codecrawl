@@ -1,5 +1,5 @@
-import type { ConfigMerged } from '../../config/configSchema';
-import type { CrawlProgressCallback } from '../../types';
+import type { ConfigMerged } from '~/config/configSchema';
+import type { CrawlProgressCallback } from '~/types';
 import { collectFiles } from '../file/fileCollect';
 import { sortPaths } from '../file/filePathSort';
 import { processFiles } from '../file/fileProcess';

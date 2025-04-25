@@ -1,6 +1,6 @@
 import type { TiktokenEncoding } from 'tiktoken';
 
-import { logger } from '../../../lib/logger';
+import { logger } from '~/lib/logger';
 import { TokenCounter } from '../../tokenCount';
 
 export interface OutputMetricsTask {

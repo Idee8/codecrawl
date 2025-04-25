@@ -2,10 +2,10 @@ import { eq } from 'drizzle-orm';
 import argon2 from 'argon2';
 import type { Request, Response } from 'express';
 import { z } from 'zod';
-import { db } from '../../db';
-import { apiKeys, teams, users } from '../../db/schema';
-import { createTokens } from '../../services/jwt-service';
-import { createApiKey } from '../../services/api-keys-service';
+import { db } from '~/db';
+import { apiKeys, teams, users } from '~/db/schema';
+import { createTokens } from '~/services/jwt-service';
+import { createApiKey } from '~/services/api-keys-service';
 
 const loginSchema = z.object({
   email: z.string().email(),

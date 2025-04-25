@@ -1,21 +1,26 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "lib": ["ES2022", "DOM"],
-
-    // or higher
-    "target": "ES2022",
-
+    "target": "es2020",
     "module": "CommonJS",
-    "esModuleInterop": true,
+    "allowJs": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types"],
     "sourceMap": true,
-    "outDir": "./dist",
-    "moduleResolution": "Node",
+    "outDir": "dist",
+    "strict": true,
+    "lib": ["es2020"],
     "baseUrl": ".",
-    "strictNullChecks": true,
-
-    "inlineSources": true
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "paths": {
+      "~/*": ["src/*"]
+    }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "coverage"]
+  "exclude": ["node_modules"]
 }

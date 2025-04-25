@@ -9,7 +9,7 @@ import {
   cloneRepository,
   cleanupTempDirectory,
 } from '../utils/remoteUtils';
-import type { CrawlOptions } from '../../types';
+import type { CrawlOptions } from '~/types';
 
 export const runRemoteAction = async (
   repoUrlInput: string,

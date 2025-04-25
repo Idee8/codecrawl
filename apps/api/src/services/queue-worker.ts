@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Worker, type Job, type Queue } from 'bullmq';
 import { v4 as uuidv4 } from 'uuid';
 
-import { logger as _logger } from '../lib/logger';
+import { logger as _logger } from '~/lib/logger';
 import {
   getGenerateLlmsTxtQueue,
   getGenerateTreeQueue,
@@ -14,18 +14,18 @@ import {
   pushConcurrencyLimitActiveJob,
   removeConcurrencyLimitActiveJob,
   takeConcurrencyLimitedJob,
-} from '../lib/concurrency-limit';
-import { updateGeneratedLlmsTxt } from '../lib/generate-llms-txt/redis';
+} from '~/lib/concurrency-limit';
+import { updateGeneratedLlmsTxt } from '~/lib/generate-llms-txt/redis';
 import {
   getLlmsTextFromCache,
   saveLlmsTxtToCache,
-} from '../lib/generate-llms-txt';
+} from '~/lib/generate-llms-txt';
 import {
   runLlmsTxtAction,
   runComprehensiveLlmsTxtAction,
   runFileTreeAction,
-} from '../core/actions';
-import { updateTreeGenerationDataStatus } from '../lib/generate-tree';
+} from '~/core/actions';
+import { updateTreeGenerationDataStatus } from '~/lib/generate-tree';
 
 /**
  * Globals

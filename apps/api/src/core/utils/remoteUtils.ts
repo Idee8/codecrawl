@@ -4,7 +4,7 @@ import os from 'node:os';
 import GitUrlParse, { type GitUrl } from 'git-url-parse';
 
 import { execGitShallowClone } from '../file/gitCommand';
-import { logger } from '../../lib/logger';
+import { logger } from '~/lib/logger';
 
 // Interface extending GitUrl to include commit hash
 interface IGitUrl extends GitUrl {

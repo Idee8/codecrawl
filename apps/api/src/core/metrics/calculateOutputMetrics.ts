@@ -1,7 +1,7 @@
 import type { TiktokenEncoding } from 'tiktoken';
 
-import { logger } from '../../lib/logger';
-import { initPiscina } from '../../lib/processConcurrency';
+import { logger } from '~/lib/logger';
+import { initPiscina } from '~/lib/processConcurrency';
 import type { OutputMetricsTask } from './workers/outputMetricsWorker';
 
 const CHUNK_SIZE = 1000;

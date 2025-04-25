@@ -3,10 +3,10 @@ import {
   configMergedSchema,
   type ConfigBase,
   type ConfigMerged,
-} from '../../config/configSchema';
-import { logger } from '../../lib/logger';
-import type { CrawlOptions } from '../../types';
-import { rethrowValidationErrorIfZodError } from '../../utils/errorHandle';
+} from '~/config/configSchema';
+import { logger } from '~/lib/logger';
+import type { CrawlOptions } from '~/types';
+import { rethrowValidationErrorIfZodError } from '~/utils/errorHandle';
 import type { ProcessedFile } from '../file/fileTypes';
 import { collectFiles } from '../file/fileCollect';
 import { processFiles } from '../file/fileProcess';

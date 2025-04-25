@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import type { Request, Response } from 'express';
 
-import { getGenerateTreeQueue } from '../../services/queue-service';
-import { saveTreeGenerationData } from '../../lib/generate-tree';
+import { getGenerateTreeQueue } from '~/services/queue-service';
+import { saveTreeGenerationData } from '~/lib/generate-tree';
 
 interface GenerateTreeRequest {
   url: string;

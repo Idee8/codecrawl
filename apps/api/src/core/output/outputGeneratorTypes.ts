@@ -1,4 +1,4 @@
-import type { ConfigMerged } from '../../config/configSchema';
+import type { ConfigMerged } from '~/config/configSchema';
 import type { ProcessedFile } from '../file/fileTypes';
 
 export interface OutputGeneratorContext {

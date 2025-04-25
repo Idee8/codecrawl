@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
 import { and, eq } from 'drizzle-orm';
 
-import { apiKeys, teamMembers } from '../../db/schema';
-import { db } from '../../db';
+import { apiKeys, teamMembers } from '~/db/schema';
+import { db } from '~/db';
 
 export async function teamKeysController(req: Request, res: Response) {
   const userId = req.userId;

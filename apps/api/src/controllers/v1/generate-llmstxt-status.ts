@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import {
   getGeneratedLLmsTxt,
   getGeneratedLlmsTxtExpiry,
-} from '../../lib/generate-llms-txt/redis';
+} from '~/lib/generate-llms-txt/redis';
 
 interface StatusParams {
   jobId: string;

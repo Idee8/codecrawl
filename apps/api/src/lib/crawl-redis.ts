@@ -1,6 +1,6 @@
-import type { CrawlOptions } from '../types';
-import { logger as _logger } from '../lib/logger';
-import { redisConnection } from '../services/queue-service';
+import type { CrawlOptions } from '~/types';
+import { logger as _logger } from '~/lib/logger';
+import { redisConnection } from '~/services/queue-service';
 
 export type StoredCrawl = {
   repoUrl: string;

@@ -1,6 +1,6 @@
 import type { TiktokenEncoding } from 'tiktoken';
 
-import { logger } from '../../../lib/logger';
+import { logger } from '~/lib/logger';
 import type { ProcessedFile } from '../../file/fileTypes';
 import { TokenCounter } from '../../tokenCount';
 import type { FileMetrics } from './types';

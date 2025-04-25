@@ -1,10 +1,10 @@
-import type { ConfigMerged } from '../../config/configSchema';
-import type { CrawlProgressCallback } from '../../types';
+import type { ConfigMerged } from '~/config/configSchema';
+import type { CrawlProgressCallback } from '~/types';
 import { type FileManipulator, getFileManipulator } from './fileManipulate';
 import type { ProcessedFile, RawFile } from './fileTypes';
 import type { FileProcessTask } from './workers/fileProcessWorker';
-import { logger } from '../../lib/logger';
-import { initPiscina } from '../../lib/processConcurrency';
+import { logger } from '~/lib/logger';
+import { initPiscina } from '~/lib/processConcurrency';
 
 type GetFileManipulator = (filePath: string) => FileManipulator | null;
 

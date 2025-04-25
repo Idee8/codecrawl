@@ -4,11 +4,11 @@ import {
   type OutputStyle,
   type ConfigBase,
   type ConfigMerged,
-} from '../../config/configSchema';
-import { logger } from '../../lib/logger';
-import type { CrawlOptions } from '../../types';
+} from '~/config/configSchema';
+import { logger } from '~/lib/logger';
+import type { CrawlOptions } from '~/types';
 import { pack, type PackResult } from '../packager';
-import { rethrowValidationErrorIfZodError } from '../../utils/errorHandle';
+import { rethrowValidationErrorIfZodError } from '~/utils/errorHandle';
 import {
   parseRemoteValue,
   createTempDirectory,

@@ -1,10 +1,10 @@
 import type { TiktokenEncoding } from 'tiktoken';
 
-import { logger } from '../../lib/logger';
-import { initPiscina } from '../../lib/processConcurrency';
+import { logger } from '~/lib/logger';
+import { initPiscina } from '~/lib/processConcurrency';
 import type { FileMetricsTask } from './workers/fileMetricsWorker';
 import type { ProcessedFile } from '../file/fileTypes';
-import type { CrawlProgressCallback } from '../../types';
+import type { CrawlProgressCallback } from '~/types';
 import type { FileMetrics } from './workers/types';
 
 const initTaskRunner = (numOfTasks: number) => {

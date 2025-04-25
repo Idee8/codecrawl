@@ -1,8 +1,8 @@
-import { logger } from '../../lib/logger';
-import { initPiscina } from '../../lib/processConcurrency';
+import { logger } from '~/lib/logger';
+import { initPiscina } from '~/lib/processConcurrency';
 import type { RawFile } from './fileTypes';
 import type { FileCollectTask } from './workers/fileCollectWorker';
-import type { CrawlProgressCallback } from '../../types';
+import type { CrawlProgressCallback } from '~/types';
 
 const initTaskRunner = (numOfTasks: number) => {
   const pool = initPiscina(

@@ -1,20 +1,21 @@
 import express from 'express';
 import expressWs from 'express-ws';
 
-import { apiKeyAuthMiddleware, authMiddleware, wrap } from '../middleware';
-import { RateLimiterMode } from '../types';
-import { generateLLMsTextController } from '../controllers/v1/generate-llmstxt';
-import { generateLLMsTextStatusController } from '../controllers/v1/generate-llmstxt-status';
+import { apiKeyAuthMiddleware, authMiddleware, wrap } from '~/middleware';
+import { RateLimiterMode } from '~/types';
+import { generateLLMsTextController } from '~/controllers/v1/generate-llmstxt';
+import { generateLLMsTextStatusController } from '~/controllers/v1/generate-llmstxt-status';
 import {
   userMeController,
   userApiKeysController,
-} from '../controllers/v1/user';
-import { livenessController } from '../controllers/v1/liveness';
-import { readinessController } from '../controllers/v1/readiness';
-import { login, register } from '../controllers/v1/auth';
-import { teamKeysController } from '../controllers/v1/teams';
-import { generateTreeStatusController } from '../controllers/v1/generate-tree-status';
-import { generateTreeController } from '../controllers/v1/generate-tree';
+  userCreateApiKeyController,
+} from '~/controllers/v1/user';
+import { livenessController } from '~/controllers/v1/liveness';
+import { readinessController } from '~/controllers/v1/readiness';
+import { login, register } from '~/controllers/v1/auth';
+import { teamKeysController } from '~/controllers/v1/teams';
+import { generateTreeStatusController } from '~/controllers/v1/generate-tree-status';
+import { generateTreeController } from '~/controllers/v1/generate-tree';
 
 expressWs(express());
 
@@ -28,6 +29,11 @@ v1Router.get('/health/readiness', wrap(readinessController));
 
 v1Router.get('/users/me', authMiddleware(false), wrap(userMeController));
 v1Router.get('/users/keys', authMiddleware(), wrap(userApiKeysController));
+v1Router.post(
+  '/users/keys',
+  authMiddleware(),
+  wrap(userCreateApiKeyController),
+);
 
 v1Router.get('/teams/:teamId/keys', authMiddleware(), wrap(teamKeysController));
 

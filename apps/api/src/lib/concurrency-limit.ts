@@ -1,6 +1,6 @@
 import type { JobsOptions } from 'bullmq';
 
-import { redisConnection } from '../services/queue-service';
+import { redisConnection } from '~/services/queue-service';
 
 const constructKey = (teamId: string) => `concurrency-limiter:${teamId}`;
 const constructQueueKey = (teamId: string) =>
@@ -51,6 +51,8 @@ export type ConcurrencyLimitedJob = {
   priority?: number;
 };
 
+type ZMPopResult = [string, [string, string]]; // [key, [member, score]]
+
 export async function takeConcurrencyLimitedJob(
   teamId: string,
 ): Promise<ConcurrencyLimitedJob | null> {
@@ -59,7 +61,9 @@ export async function takeConcurrencyLimitedJob(
     return null;
   }
 
-  return JSON.parse(res[1][0][0]);
+  // Cast to the expected type after null check
+  const typedRes = res as ZMPopResult;
+  return JSON.parse(typedRes[1][0]);
 }
 
 export async function pushConcurrencyLimitedJob(

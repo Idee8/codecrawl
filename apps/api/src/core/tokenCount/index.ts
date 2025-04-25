@@ -1,5 +1,5 @@
 import { type Tiktoken, type TiktokenEncoding, get_encoding } from 'tiktoken';
-import { logger } from '../../lib/logger';
+import { logger } from '~/lib/logger';
 
 export class TokenCounter {
   private encoding: Tiktoken;

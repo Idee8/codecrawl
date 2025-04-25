@@ -1,7 +1,7 @@
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import Redis from 'ioredis';
 
-import type { PlanType, RateLimiterMode } from '../types';
+import type { PlanType, RateLimiterMode } from '~/types';
 
 export const CONCURRENCY_LIMIT: Omit<Record<PlanType, number>, ''> = {
   free: 2,
@@ -79,8 +79,10 @@ export function getRateLimiterPoints(
 
   if (!rateLimitConfig) return RATE_LIMITS.account.default;
 
+  const key = makePlanKey(plan);
   const points: number =
-    rateLimitConfig[makePlanKey(plan) || rateLimitConfig.default];
+    rateLimitConfig[key as keyof typeof rateLimitConfig] ??
+    rateLimitConfig.default;
 
   return points;
 }

@@ -7,9 +7,8 @@ import http from 'node:http';
 import https from 'node:https';
 import os from 'node:os';
 
-import { v1Router } from './routes/v1';
-import { logger } from './lib/logger';
-import { runRemoteAction } from './core/actions/remoteAction';
+import { v1Router } from '~/routes/v1';
+import { logger } from '~/lib/logger';
 
 const numCPUs = process.env.NODE_ENV === 'production' ? os.cpus().length : 2;
 
@@ -23,14 +22,15 @@ cacheable.install(https.globalAgent);
 const ws = expressWs(express());
 const app = ws.app;
 
-global.isProduction = process.env.IS_PRODUCTION === 'true';
+declare global {
+  var isProduction: boolean;
+}
 
-// Must be placed before express.json()
-// app.all('/api/auth/*splat', toNodeHandler(auth));
+global.isProduction = process.env.IS_PRODUCTION === 'true';
 
 app.use(
   cors({
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    credentials: true,
   }),
 );
 app.use(express.json({ limit: '10mb' }));
@@ -38,17 +38,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (_req, res) => {
   res.send('CRAWLERS: Hello World');
-});
-
-app.get('/test', async (req, res) => {
-  const repoUrl =
-    (req.query.repoUrl as string) ?? 'https://github.com/irere123/run-lang';
-  const { packResult } = await runRemoteAction(repoUrl, {
-    compress: true,
-    removeComments: true,
-    removeEmptyLines: true,
-  });
-  res.send(packResult);
 });
 
 // register router

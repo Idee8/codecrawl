@@ -1,4 +1,4 @@
-import type { ConfigMerged } from '../../config/configSchema.js';
+import type { ConfigMerged } from '~/config/configSchema';
 
 interface ContentInfo {
   selection: {

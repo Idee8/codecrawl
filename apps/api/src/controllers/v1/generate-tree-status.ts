@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import {
   getTreeGenerationData,
   getTreeGenerationDataExpiry,
-} from '../../lib/generate-tree';
+} from '~/lib/generate-tree';
 
 interface StatusParams {
   jobId: string;

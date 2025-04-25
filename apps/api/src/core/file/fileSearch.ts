@@ -3,9 +3,9 @@ import path from 'node:path';
 import { minimatch } from 'minimatch';
 import { globby } from 'globby';
 
-import { logger } from '../../lib/logger';
-import type { ConfigMerged } from '../../config/configSchema';
-import { defaultIgnoreList } from '../../config/defaultIgnore';
+import { logger } from '~/lib/logger';
+import type { ConfigMerged } from '~/config/configSchema';
+import { defaultIgnoreList } from '~/config/defaultIgnore';
 import { sortPaths } from './filePathSort';
 
 export interface FileSearchResult {

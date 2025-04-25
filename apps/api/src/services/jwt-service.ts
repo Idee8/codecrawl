@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import type { User } from '../db/schema';
+import type { User } from '~/db/schema';
 
 export interface AccessTokenPayload {
   userId: string;

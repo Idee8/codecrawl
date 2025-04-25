@@ -6,7 +6,7 @@ import type {
   OutputGeneratorContext,
   RenderContext,
 } from './outputGeneratorTypes';
-import type { ConfigMerged } from '../../config/configSchema';
+import type { ConfigMerged } from '~/config/configSchema';
 import { getXmlTemplate } from './outputStyles/xmlStyle';
 import { getMarkdownTemplate } from './outputStyles/markdownStyle';
 import { getPlainTemplate } from './outputStyles/plainStyle';
