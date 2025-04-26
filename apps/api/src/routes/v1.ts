@@ -9,6 +9,7 @@ import {
   userMeController,
   userApiKeysController,
   userCreateApiKeyController,
+  userDeleteApiKeyController,
 } from '~/controllers/v1/user';
 import { livenessController } from '~/controllers/v1/liveness';
 import { readinessController } from '~/controllers/v1/readiness';
@@ -33,6 +34,11 @@ v1Router.post(
   '/users/keys',
   authMiddleware(),
   wrap(userCreateApiKeyController),
+);
+v1Router.delete(
+  '/users/keys/:keyId',
+  authMiddleware(),
+  wrap(userDeleteApiKeyController),
 );
 
 v1Router.get('/teams/:teamId/keys', authMiddleware(), wrap(teamKeysController));

@@ -53,3 +53,19 @@ export async function userCreateApiKeyController(
     return res.status(500).json({ error: 'Failed to create API key' });
   }
 }
+
+export async function userDeleteApiKeyController(
+  req: Request<any, any, { keyId: string }>,
+  res: Response,
+) {
+  const userId = req.userId;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  await db.delete(apiKeys).where(eq(apiKeys.id, req.body.keyId));
+  return res
+    .status(200)
+    .json({ message: 'API key deleted', keyId: req.body.keyId });
+}
