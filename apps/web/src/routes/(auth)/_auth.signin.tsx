@@ -19,11 +19,6 @@ import { API_BASE_URL } from '~/lib/constants';
 import { toast } from '~/components/ui/toast';
 import { useTokenStore } from '~/store/use-token-store';
 
-interface Inputs {
-  email: string;
-  password: string;
-}
-
 const authSearchSchema = z.object({
   next: fallback(z.string().optional(), ''),
   error: fallback(z.string().optional(), ''),
@@ -36,6 +31,8 @@ const loginSchema = z.object({
   password: z.string(),
 });
 
+type LoginSchemaType = z.infer<typeof loginSchema>;
+
 export const Route = createFileRoute('/(auth)/_auth/signin')({
   component: RouteComponent,
   validateSearch: authSearchSchema,
@@ -46,11 +43,11 @@ function RouteComponent() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginSchemaType>({ resolver: zodResolver(loginSchema) });
   const router = useRouter();
   const { mutateAsync } = useMutation({
     mutationKey: ['login'],
-    mutationFn: async (values: Inputs) => {
+    mutationFn: async (values: LoginSchemaType) => {
       return await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -97,7 +94,7 @@ function RouteComponent() {
       });
     },
   });
-  const onSubmit: SubmitHandler<Inputs> = async (values) =>
+  const onSubmit: SubmitHandler<LoginSchemaType> = async (values) =>
     await mutateAsync(values);
 
   return (

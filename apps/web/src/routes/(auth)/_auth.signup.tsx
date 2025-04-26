@@ -18,17 +18,14 @@ import { SvgLogo } from '~/components/svgs';
 import { toast } from '~/components/ui/toast';
 import { API_BASE_URL } from '~/lib/constants';
 
-type Inputs = {
-  email: string;
-  password: string;
-};
-
 const signupSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
   password: z
     .string()
     .min(5, { message: 'Password must be at least 5 characters long' }),
 });
+
+type SignupSchemaType = z.infer<typeof signupSchema>;
 
 export const Route = createFileRoute('/(auth)/_auth/signup')({
   component: RouteComponent,
@@ -40,10 +37,10 @@ function RouteComponent() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Inputs>({ resolver: zodResolver(signupSchema) });
+  } = useForm<SignupSchemaType>({ resolver: zodResolver(signupSchema) });
   const { mutateAsync } = useMutation({
     mutationKey: ['signup'],
-    mutationFn: async (values: Inputs) => {
+    mutationFn: async (values: SignupSchemaType) => {
       return await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
@@ -54,7 +51,7 @@ function RouteComponent() {
     },
   });
 
-  const onSubmit: SubmitHandler<Inputs> = async (values) => {
+  const onSubmit: SubmitHandler<SignupSchemaType> = async (values) => {
     try {
       const response = await mutateAsync(values);
       const data = await response.json();

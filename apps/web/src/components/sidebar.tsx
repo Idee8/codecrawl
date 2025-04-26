@@ -2,9 +2,12 @@ import { KeyIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
 import { Avatar, DropdownMenu, Flex, Text } from '@radix-ui/themes';
 import { Link } from '@tanstack/react-router';
 import { useAuthContext } from '~/contexts/auth-context';
-
+import { useTeams } from '~/contexts/teams-context';
 export function Sidebar() {
   const { user } = useAuthContext();
+  const { activeTeam } = useTeams();
+
+  console.log(activeTeam);
 
   return (
     <Flex
@@ -23,7 +26,7 @@ export function Sidebar() {
                 <Avatar fallback="PT" />
                 <Flex align={'center'} justify={'between'} flexGrow={'1'}>
                   <Flex direction={'column'}>
-                    <Text>Personal Team</Text>
+                    <Text>{activeTeam?.name}</Text>
                     <Text size={'1'} color={'green'}>
                       Free Plan
                     </Text>

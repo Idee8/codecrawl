@@ -3,7 +3,7 @@ import argon2 from 'argon2';
 import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { db } from '~/db';
-import { apiKeys, teams, users } from '~/db/schema';
+import { apiKeys, teamMembers, teams, users } from '~/db/schema';
 import { createTokens } from '~/services/jwt-service';
 import { createApiKey } from '~/services/api-keys-service';
 
@@ -64,7 +64,7 @@ export const register = async (req: Request, res: Response) => {
     const [team] = await tx
       .insert(teams)
       .values({
-        name: 'Person Team  ',
+        name: 'Personal Team',
       })
       .returning();
 
@@ -75,6 +75,11 @@ export const register = async (req: Request, res: Response) => {
         hashedPassword,
       })
       .returning();
+
+    await tx.insert(teamMembers).values({
+      userId: u?.id as string,
+      teamId: team?.id as string,
+    });
 
     await tx.insert(apiKeys).values({
       key: apiKey,

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm --filter api run dev",
-    "workers": "pnpm --filter api run workers",
+    "dev": "pnpm --filter './apps/*' run dev",
+    "workers": "pnpm --filter './apps/api' run workers",
     "format": "biome format --write ./apps/api/src"
   },
   "keywords": [],

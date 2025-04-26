@@ -13,7 +13,7 @@ import {
 import { livenessController } from '~/controllers/v1/liveness';
 import { readinessController } from '~/controllers/v1/readiness';
 import { login, register } from '~/controllers/v1/auth';
-import { teamKeysController } from '~/controllers/v1/teams';
+import { teamKeysController, teamsController } from '~/controllers/v1/teams';
 import { generateTreeStatusController } from '~/controllers/v1/generate-tree-status';
 import { generateTreeController } from '~/controllers/v1/generate-tree';
 
@@ -36,7 +36,7 @@ v1Router.post(
 );
 
 v1Router.get('/teams/:teamId/keys', authMiddleware(), wrap(teamKeysController));
-
+v1Router.get('/teams', authMiddleware(), wrap(teamsController));
 v1Router.post(
   '/llmstxt',
   apiKeyAuthMiddleware(RateLimiterMode.Crawl),
