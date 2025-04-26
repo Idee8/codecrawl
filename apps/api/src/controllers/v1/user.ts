@@ -2,9 +2,9 @@ import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { z } from 'zod';
 
-import { db } from '../../db';
-import { apiKeys, users } from '../../db/schema';
-import { createApiKey } from '../../services/api-keys-service';
+import { db } from '~/db';
+import { apiKeys, users } from '~/db/schema';
+import { createApiKey } from '~/services/api-keys-service';
 
 export async function userMeController(req: Request, res: Response) {
   const userId = req.userId;

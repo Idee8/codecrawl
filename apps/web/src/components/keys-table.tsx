@@ -44,6 +44,8 @@ export function KeysTable() {
 
   if (!data || isLoading) return null;
 
+  const isDeleteDisabled = data.keys.length === 1;
+
   return (
     <Table.Root variant={'surface'}>
       <Table.Header>
@@ -124,7 +126,11 @@ export function KeysTable() {
               </Text>
             </Table.Cell>
             <Table.Cell align={'center'}>
-              <Button variant={'ghost'} onClick={() => deleteKey(key.id)}>
+              <Button
+                variant={'ghost'}
+                onClick={() => deleteKey(key.id)}
+                disabled={isDeleteDisabled}
+              >
                 <TrashIcon className="w-4 h-4" />
               </Button>
             </Table.Cell>
