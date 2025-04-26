@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
+import { z } from 'zod';
 
 import { db } from '../../db';
 import { apiKeys, users } from '../../db/schema';
@@ -29,22 +30,33 @@ export async function userApiKeysController(req: Request, res: Response) {
   return res.status(200).json({ keys });
 }
 
+const createApiKeySchema = z.object({
+  name: z.string(),
+  teamId: z.string(),
+});
+
 export async function userCreateApiKeyController(
-  req: Request<any, any, { name: string; teamId: string }>,
+  req: Request<any, any, z.infer<typeof createApiKeySchema>>,
   res: Response,
 ) {
   const userId = req.userId;
 
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const apiKey = createApiKey();
 
   try {
+    const { name, teamId } = createApiKeySchema.parse(req.body);
+
     const [key] = await db
       .insert(apiKeys)
       .values({
         key: apiKey,
         userId: userId as string,
-        teamId: req.body.teamId,
-        name: req.body.name,
+        teamId,
+        name,
       })
       .returning();
     return res.status(200).json({ key });
@@ -54,8 +66,12 @@ export async function userCreateApiKeyController(
   }
 }
 
+const deleteApiKeySchema = z.object({
+  keyId: z.string(),
+});
+
 export async function userDeleteApiKeyController(
-  req: Request<any, any, { keyId: string }>,
+  req: Request<any, any, z.infer<typeof deleteApiKeySchema>>,
   res: Response,
 ) {
   const userId = req.userId;
@@ -64,8 +80,13 @@ export async function userDeleteApiKeyController(
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  await db.delete(apiKeys).where(eq(apiKeys.id, req.body.keyId));
-  return res
-    .status(200)
-    .json({ message: 'API key deleted', keyId: req.body.keyId });
+  try {
+    const { keyId } = deleteApiKeySchema.parse(req.body);
+
+    await db.delete(apiKeys).where(eq(apiKeys.id, keyId));
+    return res.status(200).json({ message: 'API key deleted', keyId });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to delete API key' });
+  }
 }
