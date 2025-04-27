@@ -27,6 +27,4 @@ jobs:
           npm i
           npm run build
           npm publish --access public
-          sed -i 's/"name": "@codecrawl\/sdk"/"name": "@codecrawl\/sdk"/g' package.json
-          npm publish --access public
         working-directory: ./packages/sdk
