@@ -15,6 +15,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "watch": "tsup --watch",
     "build-and-publish": "npm run build && npm publish --access public",
     "publish-beta": "npm run build && npm publish --access public --tag beta",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --verbose src/__tests__/index.test.ts"

@@ -69,8 +69,6 @@ export interface CrawlOptions {
  * Defines the options and configurations available for generating LLMs.txt.
  */
 export interface GenerateLLMsTextParams extends CrawlOptions {
-  url: string;
-  maxUrls: number;
   showFullText: boolean;
 }
 
@@ -164,16 +162,16 @@ export default class CodecrawlApp {
   /**
    * Sends a POST request to the specified URL.
    * @param url - The URL to send the request to.
-   * @param data - The data to send in the request body.
-   * @param headers - Optional headers for the request.
-   * @returns The response from the request.
+   * @param data - The data to send in the request.
+   * @param headers - The headers for the request.
+   * @returns The response from the POST request.
    */
-  async postRequest(
+  postRequest(
     url: string,
     data: any,
     headers: AxiosRequestHeaders,
   ): Promise<AxiosResponse> {
-    return await axios.post(url, data, {
+    return axios.post(url, data, {
       headers,
       timeout: data?.timeout ? data.timeout + 5000 : undefined,
     });
@@ -182,8 +180,8 @@ export default class CodecrawlApp {
   /**
    * Sends a GET request to the specified URL.
    * @param url - The URL to send the request to.
-   * @param headers - Optional headers for the request.
-   * @returns The response from the request.
+   * @param headers - The headers for the request.
+   * @returns The response from the GET request.
    */
   async getRequest(
     url: string,
@@ -192,7 +190,7 @@ export default class CodecrawlApp {
     try {
       return await axios.get(url, { headers });
     } catch (error) {
-      if (error instanceof AxiosError) {
+      if (error instanceof AxiosError && error.response) {
         return error.response as AxiosResponse;
       } else {
         throw error;
@@ -203,8 +201,8 @@ export default class CodecrawlApp {
   /**
    * Sends a DELETE request to the specified URL.
    * @param url - The URL to send the request to.
-   * @param headers - Optional headers for the request.
-   * @returns The response from the request.
+   * @param headers - The headers for the request.
+   * @returns The response from the DELETE request.
    */
   async deleteRequest(
     url: string,
@@ -213,7 +211,7 @@ export default class CodecrawlApp {
     try {
       return await axios.delete(url, { headers });
     } catch (error) {
-      if (error instanceof AxiosError) {
+      if (error instanceof AxiosError && error.response) {
         return error.response as AxiosResponse;
       } else {
         throw error;
@@ -259,16 +257,16 @@ export default class CodecrawlApp {
     try {
       const response = await this.asyncGenerateLLMsText(url, params);
 
-      if (response.success || 'error' in response) {
+      if (!response.success || 'error' in response) {
         return {
           success: false,
-          error: 'error' in response ? response.error : 'unknown error',
+          error: 'error' in response ? response.error : 'Unknown error',
         };
       }
 
       if (!response.id) {
         throw new CodecrawlError(
-          'Failed to start LLMs.txt generation. No job ID returned',
+          `Failed to start LLMs.txt generation. No job ID returned.`,
           500,
         );
       }
@@ -324,11 +322,11 @@ export default class CodecrawlApp {
     params?: GenerateLLMsTextParams,
   ): Promise<GenerateLLMsTextResponse | ErrorResponse> {
     const headers = this.prepareHeaders();
-
+    const jsonData: any = { url, ...params };
     try {
-      const response = await this.postRequest(
+      const response: AxiosResponse = await this.postRequest(
         `${this.apiUrl}/v1/llmstxt`,
-        { ...params, url },
+        jsonData,
         headers,
       );
 
@@ -340,18 +338,14 @@ export default class CodecrawlApp {
     } catch (error: any) {
       if (error.response?.data?.error) {
         throw new CodecrawlError(
-          `Failed to start LLMs.txt generation. Status code: ${error.response.status}. Error: ${error.response.data.error}`,
+          `Request failed with status code ${error.response.status}. Error: ${error.response.data.error} ${error.response.data.details ? ` - ${JSON.stringify(error.response.data.details)}` : ''}`,
           error.response.status,
         );
       } else {
-        throw new CodecrawlError(
-          `Unexpected error occurred while starting LLMs.txt generation. Status code: ${error.response.status}.`,
-          error.response.status,
-        );
+        throw new CodecrawlError(error.message, 500);
       }
     }
-
-    return { success: false, error: 'Internal Server Error' };
+    return { success: false, error: 'Internal server error.' };
   }
 
   /**
