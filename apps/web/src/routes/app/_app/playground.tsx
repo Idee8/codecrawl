@@ -1,6 +1,9 @@
 import { Box, Flex, Tabs, Text } from '@radix-ui/themes';
 import { createFileRoute } from '@tanstack/react-router';
 import { seo } from '~/utils/seo';
+import { FileTreeTab } from '~/components/playground/file-tree-tab';
+import { LLMsTxtTab } from '~/components/playground/llmstxt-tab';
+import { SettingsTab } from '~/components/playground/settings-tab';
 
 export const Route = createFileRoute('/app/_app/playground')({
   component: RouteComponent,
@@ -25,26 +28,24 @@ function RouteComponent() {
         </Flex>
       </Flex>
       <Flex direction={'column'} gap={'4'}>
-        <Tabs.Root defaultValue="llms">
+        <Tabs.Root defaultValue="filetree">
           <Tabs.List>
-            <Tabs.Trigger value="llms">LLMs.txt</Tabs.Trigger>
             <Tabs.Trigger value="filetree">File Tree</Tabs.Trigger>
+            <Tabs.Trigger value="llms">LLMs.txt</Tabs.Trigger>
             <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
           </Tabs.List>
 
           <Box pt="3">
             <Tabs.Content value="llms">
-              <Text size="2">Make changes to your account.</Text>
+              <LLMsTxtTab />
             </Tabs.Content>
 
             <Tabs.Content value="filetree">
-              <Text size="2">Access and update your documents.</Text>
+              <FileTreeTab />
             </Tabs.Content>
 
             <Tabs.Content value="settings">
-              <Text size="2">
-                Edit your profile or update contact information.
-              </Text>
+              <SettingsTab />
             </Tabs.Content>
           </Box>
         </Tabs.Root>

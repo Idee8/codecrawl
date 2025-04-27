@@ -39,6 +39,17 @@ export const mutationFnHelper = async ({
         'X-Refresh-Token': refreshToken,
       },
     });
+
+    const _accessToken = response.headers.get('access-token');
+    const _refreshToken = response.headers.get('refresh-token');
+
+    if (_accessToken && _refreshToken) {
+      useTokenStore.getState().setTokens({
+        accessToken: _accessToken,
+        refreshToken: _refreshToken,
+      });
+    }
+
     return response.data;
   } catch (error) {
     console.error(`Mutation failed: ${method} ${endpoint}`, error);

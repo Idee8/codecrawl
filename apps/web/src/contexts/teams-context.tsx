@@ -15,6 +15,13 @@ import { defaultQueryFn } from '~/lib/default-query-fn';
 export interface Team {
   id: string;
   name: string;
+  apiKeys: ApiKey[];
+}
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  key: string;
 }
 
 interface TeamsContextType {
