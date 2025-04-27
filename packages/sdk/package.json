@@ -1,6 +1,6 @@
 {
   "name": "@codecrawl/sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Codecrawl SDK for Codecrawl API",
   "main": "dist/index.js",
   "type": "module",
