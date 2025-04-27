@@ -31,7 +31,6 @@ export async function generateLLMsTextController(req: Request, res: Response) {
     createdAt: Date.now(),
     status: 'processing',
     url: req.body.url,
-    maxUrls: req.body.maxUrls,
     showFullText: req.body.showFullText,
     generatedText: '',
     fullText: '',

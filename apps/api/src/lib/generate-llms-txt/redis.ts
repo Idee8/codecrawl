@@ -8,7 +8,6 @@ export interface GenerationData {
   createdAt: number;
   status: 'processing' | 'completed' | 'failed';
   url: string;
-  maxUrls: number;
   showFullText: boolean;
   generatedText: string;
   fullText: string;

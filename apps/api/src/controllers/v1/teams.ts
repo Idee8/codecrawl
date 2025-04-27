@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 
-import { apiKeys, teamMembers, teams } from '~/db/schema';
+import { type ApiKey, apiKeys, teamMembers, teams } from '~/db/schema';
 import { db } from '~/db';
 
 export async function teamKeysController(req: Request, res: Response) {
@@ -40,10 +40,13 @@ export async function teamsController(req: Request, res: Response) {
     .select({
       id: teams.id,
       name: teams.name,
+      apiKeys: sql<ApiKey[]>`json_agg(${apiKeys})`.as('api_keys'),
     })
     .from(teamMembers)
     .innerJoin(teams, eq(teamMembers.teamId, teams.id))
-    .where(eq(teamMembers.userId, userId));
+    .innerJoin(apiKeys, eq(teams.id, apiKeys.teamId))
+    .where(eq(teamMembers.userId, userId))
+    .groupBy(teams.id, teams.name);
 
   return res.json(userTeams);
 }
