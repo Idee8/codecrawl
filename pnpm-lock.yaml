@@ -207,6 +207,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@codecrawl/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.1.0)
