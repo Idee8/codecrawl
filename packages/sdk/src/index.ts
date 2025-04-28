@@ -73,6 +73,12 @@ export interface GenerateLLMsTextParams extends CrawlOptions {
 }
 
 /**
+ * Parameters for generate file tree operations.
+ * Defines the options and configurations available for generating file tree.
+ */
+export interface GenerateFileTreeParams extends CrawlOptions {}
+
+/**
  * Error response interface for generate llmstxt operations.
  * Defines the structure of the error response received after initiating a crawl.
  */
@@ -91,6 +97,15 @@ export interface GenerateLLMsTextResponse {
 }
 
 /**
+ * Response interface for generate file tree operations.
+ * Defines the structure of the response received after initiating a file tree generation.
+ */
+export interface GenerateFileTreeResponse {
+  success: boolean;
+  id: string;
+}
+
+/**
  * Response interface for job status checks.
  * Provides detailed status of a generate llmstxt job including progress and results.
  */
@@ -99,6 +114,20 @@ export interface GenerateLLMsTextStatusResponse {
   data: {
     llmstxt: string;
     llmsfulltxt?: string;
+  };
+  status: 'processing' | 'completed' | 'failed';
+  error?: string;
+  expiresAt: string;
+}
+
+/**
+ * Response interface for file tree job status checks.
+ * Provides detailed status of a generate file tree job including progress and results.
+ */
+export interface GenerateFileTreeStatusResponse {
+  success: boolean;
+  data: {
+    tree: string;
   };
   status: 'processing' | 'completed' | 'failed';
   error?: string;
@@ -381,5 +410,181 @@ export default class CodecrawlApp {
       }
     }
     return { success: false, error: 'Internal server error.' };
+  }
+
+  /**
+   * Generate File Tree for a given repository URL and polls until completion
+   * @param {string} url - The URL of the repository to generate the file tree for.
+   * @param params - Parameters for the file tree generation.
+   * @returns The final generation results.
+   */
+  async generateFileTree(
+    url: string,
+    params?: GenerateFileTreeParams,
+  ): Promise<GenerateFileTreeStatusResponse | ErrorResponse> {
+    try {
+      const response = await this.asyncGenerateFileTree(url, params);
+
+      if (!response.success || 'error' in response) {
+        return {
+          success: false,
+          error:
+            'error' in response
+              ? response.error
+              : 'Unknown error starting file tree generation',
+        };
+      }
+
+      if (!response.id) {
+        throw new CodecrawlError(
+          `Failed to start file tree generation. No job ID returned.`,
+          500,
+        );
+      }
+
+      const jobId = response.id;
+      let generationStatus: any;
+
+      while (true) {
+        generationStatus = await this.checkGenerateFileTreeStatus(jobId);
+
+        if ('error' in generationStatus && !generationStatus.success) {
+          return generationStatus; // Return the error response directly
+        }
+
+        if (generationStatus.status === 'completed') {
+          return generationStatus;
+        }
+
+        if (generationStatus.status === 'failed') {
+          // Ensure statusCode is available, default if not
+          const statusCode = generationStatus.statusCode || 500;
+          const errorMessage =
+            generationStatus.error || 'Unknown error during generation';
+          throw new CodecrawlError(
+            `File tree generation failed. Status code: ${statusCode}. Error: ${errorMessage}`,
+            statusCode,
+          );
+        }
+
+        // Explicitly check for 'processing' before continuing the loop
+        if (generationStatus.status !== 'processing') {
+          // If status is neither completed, failed, nor processing, break and report error
+          break;
+        }
+
+        // Wait before polling again
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+      // If loop exits unexpectedly
+      return {
+        success: false,
+        error: `File tree generation ended with unexpected status: ${generationStatus?.status ?? 'unknown'}`,
+      };
+    } catch (error: any) {
+      // Handle errors thrown from asyncGenerateFileTree, checkGenerateFileTreeStatus, or CodecrawlError instances
+      if (error instanceof CodecrawlError) {
+        // Re-throw CodecrawlErrors to preserve status code and details
+        throw error;
+      } else {
+        // Wrap other errors
+        throw new CodecrawlError(
+          error.message ||
+            'An unexpected error occurred during file tree generation',
+          500,
+          error.response?.data?.details, // Include details if available from Axios error
+        );
+      }
+    }
+  }
+
+  /**
+   * Initiates a File Tree generation operation without polling.
+   * @param url - The Repository URL to generate File Tree from.
+   * @param params - Parameters for the File Tree generation operation.
+   * @returns The response containing the generation job ID.
+   */
+  async asyncGenerateFileTree(
+    url: string,
+    params?: GenerateFileTreeParams,
+  ): Promise<GenerateFileTreeResponse | ErrorResponse> {
+    const headers = this.prepareHeaders();
+    const jsonData: any = { url, ...params };
+    try {
+      const response: AxiosResponse = await this.postRequest(
+        `${this.apiUrl}/v1/tree`,
+        jsonData,
+        headers,
+      );
+
+      if (response.status === 200) {
+        return response.data as GenerateFileTreeResponse;
+      } else {
+        this.handleError(response, 'start file tree generation');
+        return {
+          success: false,
+          error: 'Failed to start file tree generation due to server error.',
+        };
+      }
+    } catch (error: any) {
+      if (error instanceof CodecrawlError) {
+        throw error;
+      } else if (error.response?.data?.error) {
+        throw new CodecrawlError(
+          `Request failed with status code ${error.response.status}. Error: ${error.response.data.error} ${error.response.data.details ? ` - ${JSON.stringify(error.response.data.details)}` : ''}`,
+          error.response.status,
+        );
+      } else {
+        throw new CodecrawlError(
+          error.message ||
+            'Network error or unexpected issue starting file tree generation.',
+          500,
+        );
+      }
+    }
+  }
+
+  /**
+   * Checks the status of a File Tree generation operation.
+   * @param id - The ID of the File Tree generation operation.
+   * @returns The current status and results of the generation operation.
+   */
+  async checkGenerateFileTreeStatus(
+    id: string,
+  ): Promise<GenerateFileTreeStatusResponse | ErrorResponse> {
+    const headers = this.prepareHeaders();
+    try {
+      const response: AxiosResponse = await this.getRequest(
+        `${this.apiUrl}/v1/tree/${id}`,
+        headers,
+      );
+
+      if (response.status === 200) {
+        return response.data as GenerateFileTreeStatusResponse;
+      } else if (response.status === 404) {
+        throw new CodecrawlError('File tree generation job not found', 404);
+      } else {
+        this.handleError(response, 'check file tree generation status');
+        return {
+          success: false,
+          error: 'Failed to check file tree status due to server error.',
+        };
+      }
+    } catch (error: any) {
+      if (error instanceof CodecrawlError) {
+        throw error;
+      } else if (error.response?.data?.error) {
+        throw new CodecrawlError(
+          `Request failed with status code ${error.response.status}. Error: ${error.response.data.error} ${error.response.data.details ? ` - ${JSON.stringify(error.response.data.details)}` : ''}`,
+          error.response.status,
+        );
+      } else {
+        throw new CodecrawlError(
+          error.message ||
+            'Network error or unexpected issue checking file tree status.',
+          500,
+        );
+      }
+    }
   }
 }
