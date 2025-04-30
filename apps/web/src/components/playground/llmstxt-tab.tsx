@@ -5,17 +5,20 @@ import { useCopyToClipboard } from 'usehooks-ts';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 
 import { codecrawl } from '~/lib/codecrawl';
+import { usePlaygroundSettingsStore } from '~/store/use-playground-settings';
 
 export function LLMsTxtTab() {
   const [llmstxt, setLLMsTxt] = useState<any>(null);
   const [isFetching, setIsFetching] = useState(false);
-  const [githubUrl, setGithubUrl] = useState('');
+  const { setGithubUrl, githubUrl, getCrawlOptions } =
+    usePlaygroundSettingsStore();
   const [, copy] = useCopyToClipboard();
 
   const generateLLMsTxt = async () => {
     setIsFetching(true);
     const response = await codecrawl.generateLLMsTxt(githubUrl, {
       showFullText: true,
+      ...getCrawlOptions(),
     });
     if ('data' in response && response.success) {
       setLLMsTxt(response.data.llmstxt);

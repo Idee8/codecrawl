@@ -5,20 +5,19 @@ import { useCopyToClipboard } from 'usehooks-ts';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 
 import { codecrawl } from '~/lib/codecrawl';
+import { usePlaygroundSettingsStore } from '~/store/use-playground-settings';
 
 export function FileTreeTab() {
   const [fileTree, setFileTree] = useState<any>(null);
   const [isFetching, setIsFetching] = useState(false);
-  const [githubUrl, setGithubUrl] = useState('');
   const [, copy] = useCopyToClipboard();
+  const { setGithubUrl, githubUrl } = usePlaygroundSettingsStore();
 
-  const generateLLMsTxt = async () => {
+  const generateFileTree = async () => {
     setIsFetching(true);
-    const response = await codecrawl.generateLLMsTxt(githubUrl, {
-      showFullText: true,
-    });
+    const response = await codecrawl.generateFileTree(githubUrl);
     if ('data' in response && response.success) {
-      setFileTree(response.data.llmstxt);
+      setFileTree(response.data.tree);
     }
     setIsFetching(false);
   };
@@ -51,7 +50,7 @@ export function FileTreeTab() {
             <Button
               variant="solid"
               disabled={isFetching}
-              onClick={generateLLMsTxt}
+              onClick={generateFileTree}
             >
               {isFetching ? 'Generating...' : 'Generate'}
             </Button>

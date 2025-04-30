@@ -143,4 +143,4 @@ _It is the sole responsibility of the end users to respect repositories' policie
 
 ## Credits 
 
-Built with inspiration and techniques from **[Firecrawl](https://github.com/mendableai/firecrawl). Special thanks to their contributors for pioneering web crawling.
+Built with inspiration from [Firecrawl](https://github.com/mendableai/firecrawl). Special thanks to their contributors for pioneering web crawling.
