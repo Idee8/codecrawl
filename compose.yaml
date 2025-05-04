@@ -1,0 +1,121 @@
+# compose.yaml (Production & Open Source Ready)
+name: codecrawl-api
+
+x-common-service: &common-service
+  # Build the image using the Dockerfile in apps/api
+  build:
+    context: ./apps/api
+  # Run as the non-root user defined in the Dockerfile
+  # user: "1001:1001" # Optional: Explicitly set user/group ID
+  ulimits:
+    nofile:
+      soft: 65535
+      hard: 65535
+  networks:
+    - internal-api-net
+  # Allows containers to reach the host machine if needed (e.g., for local debugging)
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  # Restart unless manually stopped (good for production)
+  restart: unless-stopped
+  # Read environment variables from .env file at the root
+  env_file:
+    - .env
+  # Example resource limits (adjust based on your environment)
+  # deploy:
+  #   resources:
+  #     limits:
+  #       cpus: '0.5'
+  #       memory: 512M
+  #     reservations:
+  #       cpus: '0.25'
+  #       memory: 256M
+
+x-common-env: &common-env
+  # Default Redis connection URLs (password added via REDIS_URL)
+  # REDIS_URL is expected in .env: redis://:password@redis:6379
+  REDIS_URL: ${REDIS_URL:?REDIS_URL including password must be set in .env}
+  REDIS_RATE_LIMIT_URL: ${REDIS_RATE_LIMIT_URL:-${REDIS_URL}} # Defaults to REDIS_URL if not set
+  # Default logging level
+  LOGGING_LEVEL: ${LOGGING_LEVEL:-info}
+  # Set NODE_ENV for production builds/runs by default
+  NODE_ENV: ${NODE_ENV:-production}
+  # Database URL - critical for the API, should be set via .env file
+  # Example: DATABASE_URL=postgresql://user:password@host:port/db
+  DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set in .env}
+
+services:
+  api:
+    <<: *common-service
+    environment:
+      <<: *common-env
+      # API specific environment variables
+      HOST: "0.0.0.0" # Listen on all interfaces within the container
+      PORT: ${API_PORT:-3002} # Port inside the container
+      PROCESS_TYPE: app # Tells the entrypoint script to run the API server
+    depends_on:
+      redis:
+        condition: service_healthy # Wait for Redis to be healthy
+      # postgres: # Add postgres dependency if defined
+      #   condition: service_healthy
+    ports:
+      # Map host port to container port (e.g., 3002:3002)
+      - "${API_PORT_EXTERNAL:-${API_PORT:-3002}}:${API_PORT:-3002}"
+    healthcheck:
+      # Basic TCP check on the exposed port
+      test: ["CMD", "nc", "-z", "localhost", "${API_PORT:-3002}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal-api-net
+
+  worker:
+    <<: *common-service
+    environment:
+      <<: *common-env
+      # Worker specific environment variables
+      PROCESS_TYPE: worker # Tells the entrypoint script to run the worker
+    depends_on:
+      redis:
+        condition: service_healthy # Wait for Redis to be healthy
+      api: # Optional: if worker depends on API being available first
+        condition: service_started # Or service_healthy if there's an API healthcheck endpoint
+      # postgres:
+      #   condition: service_healthy
+    healthcheck:
+      # Checks if the node process is running (adjust if entrypoint forks)
+      test: ["CMD", "pgrep", "-f", "dist/src/services/queue-worker.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s # Give the worker time to initialize
+    networks:
+      - internal-api-net
+
+  redis:
+    image: redis:7-alpine # Pin Redis version
+    networks:
+      - internal-api-net
+    volumes:
+      - redis_data:/data # Persist Redis data
+    # Run Redis server, binding to all interfaces inside the container network
+    # Require password authentication
+    command: redis-server --bind 0.0.0.0 --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD must be set in .env} --save 60 1 --loglevel warning
+    environment:
+      # Pass password for healthcheck and internal use if needed by clients
+      # Note: The command line --requirepass is the primary security mechanism
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  internal-api-net:
+    driver: bridge
+    name: codecrawl_internal_api_net 
+volumes:
+  redis_data:

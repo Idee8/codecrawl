@@ -1,0 +1,9 @@
+{$DOMAIN} { 
+    # Reverse proxy for API service
+    reverse_proxy api:4000
+}
+
+{$DOMAIN}:80 {
+    # redirect to https
+    redir {$DOMAIN}{uri}
+}

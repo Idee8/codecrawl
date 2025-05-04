@@ -1,0 +1,21 @@
+services:
+  # backend
+  api:
+    build: ./apps/api
+    environment:
+      - IS_PRODUCTION=false
+      - PORT=4000
+      - HOST=0.0.0.0
+      - NODE_ENV=development
+      - REDIS_URL=redis://localhost:6379 
+      - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/codecrawl
+      - REDIS_RATE_LIMIT_URL=redis://localhost:6379
+      - ACCESS_TOKEN_SECRET=your_secret
+      - REFRESH_TOKEN_SECRET=your_secret
+    ports:
+      - 4000:4000
+  postgres:
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRE_DB=postgres

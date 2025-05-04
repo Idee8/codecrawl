@@ -1,0 +1,38 @@
+
+services:
+  caddy:
+    networks:
+      - codecrawl
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    env_file:
+      - caddy.env
+  api:
+    networks:
+      - codecrawl
+    image: ghcr.io/idee8/codecrawl-api:latest
+    env_file:
+      - spek.env
+  postgres:
+    networks:
+      - codecrawl
+    env_file:
+      - pg.env
+  rabbitmq:
+    networks:
+      - codecrawl
+    env_file:
+      - rabbit.env
+
+volumes:
+  caddy_data:
+  caddy_config:
+networks:
+  codecrawl:
