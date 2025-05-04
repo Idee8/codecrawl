@@ -9,6 +9,7 @@ import { codecrawl } from '~/lib/codecrawl';
 import { useCopyToClipboard } from 'usehooks-ts';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
+
 export const Route = createFileRoute('/(marketing)/_landing/playground')({
   component: RouteComponent,
 });

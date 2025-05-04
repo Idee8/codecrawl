@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter './apps/*' run dev",
     "workers": "pnpm --filter './apps/api' run workers",
-    "format": "biome format --write ./apps/api/src"
+    "format": "biome format --write ."
   },
   "keywords": [],
   "author": "",
