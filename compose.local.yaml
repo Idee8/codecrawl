@@ -1,21 +1,77 @@
+# compose.local.yaml (Overrides for Local Development)
+# Use with: docker compose -f compose.yaml -f compose.local.yaml up
+
 services:
   # backend
   api:
-    build: ./apps/api
+    build:
+      context: ./apps/api
+      target: base 
     environment:
-      - IS_PRODUCTION=false
-      - PORT=4000
-      - HOST=0.0.0.0
-      - NODE_ENV=development
-      - REDIS_URL=redis://localhost:6379 
-      - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/codecrawl
-      - REDIS_RATE_LIMIT_URL=redis://localhost:6379
-      - ACCESS_TOKEN_SECRET=your_secret
-      - REFRESH_TOKEN_SECRET=your_secret
+      NODE_ENV: development
+      LOGGING_LEVEL: debug
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/codecrawl_dev
+      REDIS_URL: redis://redis:6379
+      REDIS_PASSWORD: "" 
     ports:
-      - 4000:4000
-  postgres:
+      - "${API_PORT_EXTERNAL:-4000}:${API_PORT:-3002}" 
+    volumes:
+      - ./apps/api:/app 
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+
+  worker:
+    build:
+      context: ./apps/api
+      target: base 
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRE_DB=postgres
+      NODE_ENV: development
+      LOGGING_LEVEL: debug
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/codecrawl_dev
+      REDIS_URL: redis://redis:6379
+      REDIS_PASSWORD: "" 
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+      - api
+
+  postgres:
+    image: postgres:15-alpine
+    networks:
+      - internal-api-net 
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres 
+      POSTGRES_DB: codecrawl_dev 
+    ports:
+      - "5432:5432" 
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d codecrawl_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - internal-api-net 
+    ports:
+      - "6379:6379" 
+    volumes:
+      - redis_data_local:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data_local:
+  redis_data_local:

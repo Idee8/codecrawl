@@ -5,6 +5,8 @@ ENV PATH="$PNPM_HOME:$PATH"
 # Tell Node.js not to run scripts as root
 ENV npm_config_unsafe_perm true
 
+# Prepare the specific pnpm version mentioned in the error
+RUN corepack prepare pnpm@9.1.0 --activate
 RUN corepack enable
 
 # Create app directory
@@ -31,7 +33,7 @@ USER nodejs
 
 FROM base AS prod-deps
 WORKDIR /app
-USER root # Temporarily switch back to root for global installs if needed, but pnpm store is fine
+USER root
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter api --prod
 # Ensure node_modules is owned by nodejs user
 RUN chown -R nodejs:nodejs /app/node_modules
@@ -39,7 +41,7 @@ USER nodejs
 
 FROM base AS build
 WORKDIR /app
-USER root # Temporarily switch back to root for builds if needed
+USER root
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter api && pnpm run build
 # Ensure dist is owned by nodejs user
 RUN chown -R nodejs:nodejs /app/dist

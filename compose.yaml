@@ -35,13 +35,9 @@ x-common-env: &common-env
   # Default Redis connection URLs (password added via REDIS_URL)
   # REDIS_URL is expected in .env: redis://:password@redis:6379
   REDIS_URL: ${REDIS_URL:?REDIS_URL including password must be set in .env}
-  REDIS_RATE_LIMIT_URL: ${REDIS_RATE_LIMIT_URL:-${REDIS_URL}} # Defaults to REDIS_URL if not set
-  # Default logging level
+  REDIS_RATE_LIMIT_URL: ${REDIS_RATE_LIMIT_URL:-${REDIS_URL}} 
   LOGGING_LEVEL: ${LOGGING_LEVEL:-info}
-  # Set NODE_ENV for production builds/runs by default
   NODE_ENV: ${NODE_ENV:-production}
-  # Database URL - critical for the API, should be set via .env file
-  # Example: DATABASE_URL=postgresql://user:password@host:port/db
   DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set in .env}
 
 services:
@@ -49,13 +45,12 @@ services:
     <<: *common-service
     environment:
       <<: *common-env
-      # API specific environment variables
-      HOST: "0.0.0.0" # Listen on all interfaces within the container
-      PORT: ${API_PORT:-3002} # Port inside the container
-      PROCESS_TYPE: app # Tells the entrypoint script to run the API server
+      HOST: "0.0.0.0" 
+      PORT: ${API_PORT:-3002} 
+      PROCESS_TYPE: app 
     depends_on:
       redis:
-        condition: service_healthy # Wait for Redis to be healthy
+        condition: service_healthy 
       # postgres: # Add postgres dependency if defined
       #   condition: service_healthy
     ports:
@@ -89,18 +84,16 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 20s # Give the worker time to initialize
+      start_period: 20s 
     networks:
       - internal-api-net
 
   redis:
-    image: redis:7-alpine # Pin Redis version
+    image: redis:7-alpine 
     networks:
       - internal-api-net
     volumes:
-      - redis_data:/data # Persist Redis data
-    # Run Redis server, binding to all interfaces inside the container network
-    # Require password authentication
+      - redis_data:/data 
     command: redis-server --bind 0.0.0.0 --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD must be set in .env} --save 60 1 --loglevel warning
     environment:
       # Pass password for healthcheck and internal use if needed by clients

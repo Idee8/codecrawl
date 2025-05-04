@@ -1,38 +1,123 @@
+# compose.prod.yaml (Standalone Production Configuration)
+# Use with: docker compose -f compose.prod.yaml up
+
+# Note: Ensure api.env, postgres.env, caddy.env contain production values.
 
 services:
   caddy:
-    networks:
-      - codecrawl
-    image: caddy:latest
+    image: caddy:2-alpine
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp" # For HTTP/3
+    networks:
+      - codecrawl_prod_net 
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro # Mount read-only
       - caddy_data:/data
       - caddy_config:/config
     env_file:
       - caddy.env
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
   api:
+    image: ghcr.io/Idee8/codecrawl-api:latest
+    restart: unless-stopped
     networks:
-      - codecrawl
+      - codecrawl_prod_net
+    env_file:
+      - api.env
+    environment:
+      NODE_ENV: production
+      HOST: "0.0.0.0"
+      PORT: 3002
+      PROCESS_TYPE: app
+      # Ensure api.env defines: DATABASE_URL, REDIS_URL, REDIS_PASSWORD, etc.
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "3002"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  worker:
     image: ghcr.io/idee8/codecrawl-api:latest
+    restart: unless-stopped
+    networks:
+      - codecrawl_prod_net
     env_file:
-      - spek.env
+      - api.env
+    environment:
+      NODE_ENV: production
+      PROCESS_TYPE: worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "dist/src/services/queue-worker.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
     networks:
-      - codecrawl
+      - codecrawl_prod_net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data 
     env_file:
-      - pg.env
-  rabbitmq:
+      - postgres.env 
+    environment:
+      # Ensure postgres.env defines POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+      PGDATA: /var/lib/postgresql/data/pgdata 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
     networks:
-      - codecrawl
+      - codecrawl_prod_net
+    command: redis-server --save 60 1 --loglevel warning --requirepass $$REDIS_PASSWORD
     env_file:
-      - rabbit.env
+      - api.env
+    environment:
+      # Ensure api.env defines REDIS_PASSWORD
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Redis password not set in env file}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "$$REDIS_PASSWORD", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
 volumes:
   caddy_data:
   caddy_config:
+  postgres_data:
+  redis_data:
+
 networks:
-  codecrawl:
+  codecrawl_prod_net:
+    driver: bridge
+    name: codecrawl_prod_net 
